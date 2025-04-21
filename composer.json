@@ -1,0 +1,25 @@
+{
+  "name": "giordano-de-brito/gio-php",
+  "description": "My personal PHP framework. Made for studying reasons.",
+  "autoload": {
+    "psr-4": {
+	  "GioPHP\\": "src/"
+    }
+  },
+  "require": {
+    "php": ">=8.0"
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-main": "1.0-dev"
+    }
+  },
+  "archive": {
+    "exclude": [
+      "/docker-compose.yml",
+	  "/Dockerfile",
+	  "/public",
+	  "/src/Template"
+    ]
+  }
+}
