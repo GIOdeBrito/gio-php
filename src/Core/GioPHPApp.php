@@ -4,6 +4,7 @@ namespace GioPHP\Core;
 
 use GioPHP\Routing\Router;
 use GioPHP\Config\Loader;
+use GioPHP\Abraxas\Db;
 
 class GioPHPApp
 {
@@ -13,8 +14,9 @@ class GioPHPApp
 	public function __construct ()
 	{
 		$this->loader = new Loader();
-
 		$this->router = new Router($this->loader);
+
+		Db::constructor($this->loader);
 	}
 
 	public function router (): object

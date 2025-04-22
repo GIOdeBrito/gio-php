@@ -7,10 +7,18 @@ class Loader
 	private string $views;
 	private string $layout;
 
+	private string $connectionString;
+	private ?string $dbLogin;
+	private ?string $dbPwd;
+
 	public function __construct ()
 	{
 		$this->viewsPath = "App/Views";
 		$this->layoutPath = "App/Template/_layout.php";
+
+		$this->connectionString = "";
+		$this->dbLogin = NULL;
+		$this->dbPwd = NULL;
 	}
 
 	public function __set (string $key, mixed $param): void
@@ -41,6 +49,11 @@ class Loader
 	private function layout (string $path): void
 	{
 		$this->layout = $path;
+	}
+
+	private function connectionString (string $connection): void
+	{
+		$this->connectionString = $connection;
 	}
 }
 

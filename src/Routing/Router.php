@@ -36,6 +36,16 @@ class Router
 		$this->addRoute('POST', $route, $callback);
 	}
 
+	public function put (string $route, object|string|array $callback)
+	{
+		$this->addRoute('PUT', $route, $callback);
+	}
+
+	public function delete (string $route, object|string|array $callback)
+	{
+		$this->addRoute('DELETE', $route, $callback);
+	}
+
 	private function addRoute (string $method, string $route, object|string|array $callback): void
 	{
 		if(!array_key_exists($method, $this->routes))
