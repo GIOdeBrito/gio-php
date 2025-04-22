@@ -46,17 +46,38 @@ class Db
 		}
 	}
 
-	public static function query (string $sql, array $params = []): mixed
+	public static function query (string $sql, array $params = [], bool $isObject = false): array|object
 	{
 		if(is_null(self::$pdo))
 		{
 			return NULL;
 		}
 
-		$res = self::$pdo->prepare($sql);
-		$res->execute();
+		try
+		{
+			$res = self::$pdo->prepare($sql);
 
-		return $res->fetchAll(\PDO::FETCH_ASSOC);
+			// Set SQL bindings
+			foreach($params as $i => $value)
+			{
+				$res->bindValue($i + 1, $value);
+			}
+
+			$res->execute();
+
+			// Return data as objects
+			if($isObject)
+			{
+				$res->fetchAll(\PDO::FETCH_OBJ);
+			}
+
+			// Return as array
+			return $res->fetchAll(\PDO::FETCH_ASSOC);
+		}
+		catch(\PDOException $ex)
+		{
+			return (object)[ 'err' => true, 'message' => $ex->getMessage() ];
+		}
 	}
 
 	public static function exec (string $sql, array $params = []): object
@@ -69,12 +90,12 @@ class Db
 
 	public static function commit (): void
 	{
-
+		$this->pdo->commit();
 	}
 
 	public static function rollback (): void
 	{
-
+		$this->pdo->rollback();
 	}
 
 	public static function close (): void

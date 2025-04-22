@@ -4,19 +4,34 @@ namespace GioPHP\Abraxas;
 
 use GioPHP\Abraxas\QueryBuilder;
 
-class Model
+abstract class Model extends QueryBuilder
 {
-	private array $params;
+	private array $properties = [];
 	private string $table;
 
-	public function __construct ()
+	public function __construct (?string $table = NULL)
 	{
 		$this->table = get_class($this);
+
+		if(!is_null($table))
+		{
+			$this->table = $table;
+		}
+
+		$this->getPublicProperties();
+
+		parent::__construct($this->table, $this->properties);
 	}
 
-	public function query (): object|null
+	private function getPublicProperties ()
 	{
-		return new QueryBuilder($this->table);
+		$reflect = new \ReflectionClass($this);
+		$properties = $reflect->getProperties(\ReflectionProperty::IS_PUBLIC);
+
+		foreach($properties as $item)
+		{
+		    array_push($this->properties, $item->name);
+		}
 	}
 }
 

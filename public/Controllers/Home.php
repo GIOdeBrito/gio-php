@@ -2,7 +2,7 @@
 
 use GioPHP\Core\Controller;
 
-require __DIR__.'/../Models/User.php';
+require __DIR__.'/../Models/Users.php';
 
 class Home extends Controller
 {
@@ -20,8 +20,9 @@ class Home extends Controller
 
 		$user = new USERS();
 
-		echo $user->query()->select()->where('name', '=', 'gio')->sql();
+		$items = $user->select()->where('UNAME', 'GIORDANO')->and('ID', 1)->get();
 
+		var_dump($items);
 		die();
 
 		$res->setStatus(200);

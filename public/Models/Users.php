@@ -4,8 +4,8 @@ use GioPHP\Abraxas\Model;
 
 class USERS extends Model
 {
-	public $name;
-	
+	public $ID;
+	public $UNAME;
 }
 
 ?>

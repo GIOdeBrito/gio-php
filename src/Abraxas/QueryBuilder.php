@@ -3,13 +3,16 @@
 namespace GioPHP\Abraxas;
 
 use GioPHP\Abraxas\Db;
+use GioPHP\Helpers\StringTools;
 
-class QueryBuilder
+abstract class QueryBuilder
 {
 	private string $cmd;
 	private string $table;
+	private array $properties;
+	private array $sqlParams = [];
 
-	public function __construct (string $table)
+	public function __construct (string $table, array $properties = [])
 	{
 		if(!Db::open())
 		{
@@ -17,7 +20,8 @@ class QueryBuilder
 		}
 
 		$this->cmd = "";
-		$this->table = "";
+		$this->table = $table;
+		$this->properties = $properties;
 	}
 
 	public function __destruct ()
@@ -25,25 +29,56 @@ class QueryBuilder
 		Db::close();
 	}
 
-	public function select (string $param): object
+	// Basic SELECT statement
+	public function select (...$columns): object
 	{
-		$this->cmd .= "SELECT {$param} FROM {$table} ";
+		if(is_null($columns) || empty($columns))
+		{
+			$columns = implode(',', $this->properties);
+		}
+		else
+		{
+			$columns = implode(',', $columns);
+		}
+
+		$this->cmd .= "SELECT {$columns} FROM {$this->table} ";
 		return $this;
 	}
 
-	public function where (string $column, string $operator, string|int|float $value): object
+	public function where (string $column, string|int|float $operator, string|int|float|null $value = NULL): object
 	{
-		$this->cmd .= "WHERE {$column} {$operator} {$value} ";
+		// The default operator is the equal sign
+		if(is_null($value))
+		{
+			$value = $operator;
+			$operator = '=';
+		}
+
+		array_push($this->sqlParams, $value);
+
+		$this->cmd .= "WHERE {$column} {$operator} ? ";
+
 		return $this;
 	}
 
-	public function first (): object
+	public function and (string $column, string|int|float $operator, string|int|float|null $value = NULL): object
 	{
-		$this->cmd .= "LIMIT 1";
-		return Db::query($this->sql);
+		// The default operator is the equal sign
+		if(is_null($value))
+		{
+			$value = $operator;
+			$operator = '=';
+		}
+
+		array_push($this->sqlParams, $value);
+
+		$this->cmd .= "AND {$column} {$operator} ? ";
+
+		return $this;
 	}
 
-	public function asc (string $tablename)
+	// TODO: Implement ordering with multiple tables
+	public function asc (...$tablenames)
 	{
 		if(empty($tablename))
 		{
@@ -56,6 +91,18 @@ class QueryBuilder
 	public function sql (): string
 	{
 		return $this->cmd;
+	}
+
+	// Gets first item from query
+	public function first (): array|object
+	{
+		$this->cmd .= "LIMIT 1";
+		return Db::query($this->sql(), $this->sqlParams);
+	}
+
+	public function get (): array|object
+	{
+		return Db::query($this->sql(), $this->sqlParams);
 	}
 }
 
