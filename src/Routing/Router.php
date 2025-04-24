@@ -4,7 +4,8 @@ namespace GioPHP\Routing;
 
 use GioPHP\Http\Request;
 use GioPHP\Http\Response;
-use GioPHP\Config\Loader;
+use GioPHP\Services\Loader;
+use GioPHP\Services\Logger;
 
 class Router
 {
@@ -12,8 +13,9 @@ class Router
 	private string $notFoundPage = "";
 
 	private Loader $loader;
+	private Logger $logger;
 
-	public function __construct (Loader $loader)
+	public function __construct (Loader $loader, Logger $logger)
 	{
 		$this->routes = [
 			'GET' 		=> [],
@@ -23,7 +25,9 @@ class Router
 		];
 
 		$this->notFoundPage = "/404";
+
 		$this->loader = $loader;
+		$this->logger = $logger;
 	}
 
 	public function get (string $route, object|string|array $callback)
@@ -97,8 +101,11 @@ class Router
 		// If route does not exists, redirects user to the 404 page
 		if(is_null($route))
 		{
+			$this->logger->warning("Route {$req->uri} not found");
 			$res->redirect($this->notFoundPage);
 		}
+
+		$this->logger->info("Route {$req->uri} found");
 
 		$this->routes[$req->method][$route]($req, $res);
 	}

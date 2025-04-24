@@ -1,6 +1,6 @@
 <?php
 
-namespace GioPHP\Config;
+namespace GioPHP\Services;
 
 class Loader
 {

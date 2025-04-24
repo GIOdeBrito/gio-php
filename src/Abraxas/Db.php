@@ -2,7 +2,7 @@
 
 namespace GioPHP\Abraxas;
 
-use GioPHP\Config\Loader;
+use GioPHP\Services\Loader;
 
 /* Database singleton */
 

@@ -2,7 +2,7 @@
 
 namespace GioPHP\Http;
 
-use GioPHP\Config\Loader;
+use GioPHP\Services\Loader;
 
 enum ResponseTypeEnum
 {

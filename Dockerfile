@@ -12,5 +12,8 @@ RUN php composer.phar install
 # Enables the rewrite module for .htaccess
 RUN a2enmod rewrite
 
+RUN mkdir public-standalone/logs
+RUN chown -R www-data:www-data public-standalone/logs
+
 # Expose port 80
 EXPOSE 80

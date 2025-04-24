@@ -26,6 +26,11 @@ abstract class Controller
 		self::$data['title'] = $name;
 	}
 
+	protected static function viewDataSetKeyValue (string $key, mixed $value)
+	{
+		self::$data[$key] = $value;
+	}
+
 	protected static function enqueueScript (string $file, string $version = "1.0.0", bool $ismodule = false): void
 	{
 		$type = "text/javascript";

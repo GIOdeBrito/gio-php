@@ -19,6 +19,7 @@
       "/docker-compose.yml",
 	  "/Dockerfile",
 	  "/public",
+	  "/public-standalone",
 	  "/src/Template"
     ]
   }
