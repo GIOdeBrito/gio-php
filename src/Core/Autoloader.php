@@ -4,10 +4,12 @@
 GioPHP Autoloader
 
 Import this file into your application's main entrypoint.
-To use it without the need of Composer.
+To use GioPHP without the need of Composer.
+
+PHP 8 or higher is required to run it.
 ====== */
 
-function __GioPHPAutoloader__ ($classname)
+function __GioPHPAutoloader__ (string $classname)
 {
 	// Get the root folder of the framework
 	$root = __DIR__.'/../';
