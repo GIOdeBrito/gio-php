@@ -9,7 +9,7 @@ To use GioPHP without the need of Composer.
 PHP 8 or higher is required to run it.
 ====== */
 
-function __GioPHPAutoloader__ (string $classname)
+function __GioPHPAutoloader__ (string $classname): void
 {
 	// Get the root folder of the framework
 	$root = __DIR__.'/../';
@@ -18,20 +18,20 @@ function __GioPHPAutoloader__ (string $classname)
 	$paths = explode('/', str_replace('\\', DIRECTORY_SEPARATOR, $classname));
 
 	// Removes the first item of the array
-    array_shift($paths);
+	array_shift($paths);
 
 	$classPath = implode('/', $paths);
 
 	// Searches for the file within GioPHP's folder
-	$path = $root.str_replace('\\', DIRECTORY_SEPARATOR, $classPath).'.php';
+	$fullpath = $root.str_replace('\\', DIRECTORY_SEPARATOR, $classPath).'.php';
 
-	if(!file_exists($path))
+	if(!file_exists($fullpath))
 	{
 		throw new Exception("Class '{$classname}' not found");
 		return;
 	}
 
-	require $path;
+	require $fullpath;
 }
 
 spl_autoload_register('__GioPHPAutoloader__');
