@@ -16,5 +16,8 @@ RUN a2enmod rewrite
 RUN mkdir logs
 RUN chown -R www-data:www-data logs
 
+# Create a standalone release package
+RUN tar -czvf gio-php-version-$(cat VERSION).tar.gz src/
+
 # Expose port 80
 EXPOSE 80
