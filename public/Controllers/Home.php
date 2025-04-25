@@ -1,40 +1,44 @@
 <?php
 
-use GioPHP\Core\Controller;
+//use GioPHP\Core\Controller;
 
 require __DIR__.'/../Models/Users.php';
 
-class Home extends Controller
+class Home
 {
 	public static function index ($req, $res): void
 	{
-		self::setTitle("Home");
+		$viewData = [
+			'title' => 'Home'
+		];
 
 		$res->setStatus(200);
-		$res->render('Home', self::getViewData());
+		$res->render('Home', $viewData);
 	}
 
 	public static function db ($req, $res): void
 	{
-		self::setTitle("Db");
+		$viewData = [
+			'title' => 'Db'
+		];
 
 		$user = new USERS();
 
-		$items = $user->select()->where('UNAME', 'GIORDANO')->and('ID', 1)->get();
+		$items = $user->select()->where('UNAME', 'GIORDANO')->and('ID', 1)->asc()->object();
 
 		var_dump($items);
+
+		//echo $user->select()->where('UNAME', 'GIORDANO')->and('ID', 1)->asc()->sql();
 		die();
 
 		$res->setStatus(200);
-		$res->render('Home', self::getViewData());
+		$res->render('Home', $viewData);
 	}
 
 	public static function notFound ($req, $res)
 	{
-		echo "<h1>Not Found 404</h1>";
-
 		$res->setStatus(404);
-		$res->end();
+		$res->html("<h1>Not Found<h1>");
 	}
 }
 

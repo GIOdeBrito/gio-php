@@ -3,11 +3,10 @@
 namespace GioPHP\Abraxas;
 
 use GioPHP\Abraxas\Db;
-use GioPHP\Helpers\StringTools;
 
 abstract class QueryBuilder
 {
-	private string $cmd;
+	private array $cmd = [];
 	private string $table;
 	private array $properties;
 	private array $sqlParams = [];
@@ -19,7 +18,6 @@ abstract class QueryBuilder
 			echo "Could not open DB connection";
 		}
 
-		$this->cmd = "";
 		$this->table = $table;
 		$this->properties = $properties;
 	}
@@ -41,7 +39,7 @@ abstract class QueryBuilder
 			$columns = implode(',', $columns);
 		}
 
-		$this->cmd .= "SELECT {$columns} FROM {$this->table} ";
+		array_push($this->cmd, "SELECT {$columns} FROM {$this->table}");
 		return $this;
 	}
 
@@ -56,7 +54,7 @@ abstract class QueryBuilder
 
 		array_push($this->sqlParams, $value);
 
-		$this->cmd .= "WHERE {$column} {$operator} ? ";
+		array_push($this->cmd, "WHERE {$column} {$operator} ?");
 
 		return $this;
 	}
@@ -72,37 +70,47 @@ abstract class QueryBuilder
 
 		array_push($this->sqlParams, $value);
 
-		$this->cmd .= "AND {$column} {$operator} ? ";
+		array_push($this->cmd, "AND {$column} {$operator} ?");
 
 		return $this;
 	}
 
-	// TODO: Implement ordering with multiple tables
 	public function asc (...$tablenames)
 	{
-		if(empty($tablename))
-		{
-			$tablename = $this->table;
-		}
+		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
+		array_push($this->cmd, "ORDER BY {$tables} ASC");
+		return $this;
+	}
 
-		$this->cmd .= "ORDER BY {$tablename} ASC ";
+	public function desc (...$tablenames)
+	{
+		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
+		array_push($this->cmd, "ORDER BY {$tables} DESC");
+		return $this;
 	}
 
 	public function sql (): string
 	{
-		return $this->cmd;
+		return implode(' ', $this->cmd);
 	}
 
 	// Gets first item from query
 	public function first (): array|object
 	{
-		$this->cmd .= "LIMIT 1";
+		array_push($this->cmd, "LIMIT 1");
 		return Db::query($this->sql(), $this->sqlParams);
 	}
 
-	public function get (): array|object
+	// Performs the query
+	public function get (): array
 	{
 		return Db::query($this->sql(), $this->sqlParams);
+	}
+
+	// Returns the query as an object array
+	public function object (): array
+	{
+		return Db::query($this->sql(), $this->sqlParams, true);
 	}
 }
 

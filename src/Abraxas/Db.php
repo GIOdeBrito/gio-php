@@ -68,7 +68,7 @@ class Db
 			// Return data as objects
 			if($isObject)
 			{
-				$res->fetchAll(\PDO::FETCH_OBJ);
+				return $res->fetchAll(\PDO::FETCH_OBJ);
 			}
 
 			// Return as array
