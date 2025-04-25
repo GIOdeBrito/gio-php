@@ -8,6 +8,6 @@ if(php_sapi_name() !== 'cli')
 
 echo "GioPHP Installer";
 
-
+echo PHP_EOL;
 
 ?>
