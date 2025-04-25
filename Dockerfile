@@ -17,7 +17,7 @@ RUN mkdir logs
 RUN chown -R www-data:www-data logs
 
 # Create a standalone release package
-RUN tar -czvf gio-php-v$(cat VERSION).tar.gz src/
+#RUN tar -czvf gio-php-v$(cat VERSION).tar.gz src/
 
 # Expose port 80
 EXPOSE 80
