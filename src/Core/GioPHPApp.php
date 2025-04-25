@@ -19,7 +19,7 @@ class GioPHPApp
 		$this->loader = new Loader();
 		$this->router = new Router($this->loader, $this->logger);
 
-		Db::constructor($this->loader);
+		Db::constructor($this->loader, $this->logger);
 	}
 
 	public function logger (): object
@@ -39,7 +39,7 @@ class GioPHPApp
 
 	public function run (): void
 	{
-		$this->logger->info("Application was started");
+		$this->logger->info("Application was started.");
 
 		$this->router->call();
 		die();

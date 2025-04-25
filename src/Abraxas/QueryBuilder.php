@@ -13,10 +13,7 @@ abstract class QueryBuilder
 
 	public function __construct (string $table, array $properties = [])
 	{
-		if(!Db::open())
-		{
-			echo "Could not open DB connection";
-		}
+		Db::open();
 
 		$this->table = $table;
 		$this->properties = $properties;
@@ -53,7 +50,6 @@ abstract class QueryBuilder
 		}
 
 		array_push($this->sqlParams, $value);
-
 		array_push($this->cmd, "WHERE {$column} {$operator} ?");
 
 		return $this;
@@ -69,20 +65,19 @@ abstract class QueryBuilder
 		}
 
 		array_push($this->sqlParams, $value);
-
 		array_push($this->cmd, "AND {$column} {$operator} ?");
 
 		return $this;
 	}
 
-	public function asc (...$tablenames)
+	public function asc (...$tablenames): object
 	{
 		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
 		array_push($this->cmd, "ORDER BY {$tables} ASC");
 		return $this;
 	}
 
-	public function desc (...$tablenames)
+	public function desc (...$tablenames): object
 	{
 		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
 		array_push($this->cmd, "ORDER BY {$tables} DESC");

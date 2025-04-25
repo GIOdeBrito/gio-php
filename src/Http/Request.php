@@ -2,6 +2,8 @@
 
 namespace GioPHP\Http;
 
+use GioPHP\Services\Logger;
+
 class Request
 {
 	private string $method = "";
@@ -11,11 +13,14 @@ class Request
 	private ?object $body = NULL;
 	private ?object $files = NULL;
 
-	public function __construct ()
+	private Logger $logger;
+
+	public function __construct (Logger $logger)
 	{
 		$this->method = strtoupper($_SERVER["REQUEST_METHOD"]);
 		$this->uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
+		$this->logger = $logger;
 		$this->getPosted();
 	}
 
@@ -23,7 +28,9 @@ class Request
 	{
 		if(!property_exists($this, $name))
 		{
-			throw new Exception("Property {$name} does not have a getter function or does not exist");
+			//throw new Exception("Property {$name} does not have a getter function or does not exist");
+			$this->logger->error("Property {$name} does not have a getter function or does not exist.");
+			return NULL;
 		}
 
 		return $this->{$name}();
@@ -61,10 +68,13 @@ class Request
 
 	private function getPosted (): void
 	{
+		// Gets formdata
 		$this->form = (object) (json_decode($_POST['body'] ?? '', true));
 
+		// Gets JSON
 		$this->body = (object) (json_decode(file_get_contents('php://input') ?? '', true));
 
+		// Gets files via formdata
 		$this->files = (object) ($_FILES['uploadedfiles'] ?? []);
 	}
 

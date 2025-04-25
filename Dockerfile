@@ -12,8 +12,9 @@ RUN php composer.phar install
 # Enables the rewrite module for .htaccess
 RUN a2enmod rewrite
 
-RUN mkdir public-standalone/logs
-RUN chown -R www-data:www-data public-standalone/logs
+# Create logs folder and set Apache as its owner
+RUN mkdir logs
+RUN chown -R www-data:www-data logs
 
 # Expose port 80
 EXPOSE 80

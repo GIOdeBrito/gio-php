@@ -33,7 +33,7 @@ class Logger
 			$content .= " {$flattened}";
 		}
 
-		$content .= '\n';
+		$content .= PHP_EOL;
 
 		file_put_contents($this->outputDir.'/log.txt', $content, FILE_APPEND | LOCK_EX);
 	}

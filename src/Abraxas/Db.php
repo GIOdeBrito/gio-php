@@ -3,31 +3,23 @@
 namespace GioPHP\Abraxas;
 
 use GioPHP\Services\Loader;
+use GioPHP\Services\Logger;
 
 /* Database singleton */
 
 class Db
 {
 	private static ?\PDO $pdo = NULL;
-	private static ?Loader $loader = NULL;
+	private static Loader $loader;
+	private static Logger $logger;
 
-	public static function constructor (Loader $loader): void
+	public static function constructor (Loader $loader, Logger $logger): void
 	{
 		self::$loader = $loader;
+		self::$logger = $logger;
 	}
 
-	public static function status (): void
-	{
-		if(is_null(self::$loader))
-		{
-			echo "Loader not set";
-			return;
-		}
-
-		echo "Loader set";
-	}
-
-	public static function open (): bool
+	public static function open (): void
 	{
 		$connection = self::$loader->connectionString;
 		$login = self::$loader->dbLogin;
@@ -37,20 +29,29 @@ class Db
 		{
 			self::$pdo = new \PDO($connection, $login, $pwd);
 			self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			return true;
+			self::$logger->info("DB successfully connected.");
 		}
-		catch(\PDOException $e)
+		catch(\PDOException $ex)
 		{
-			//echo "Error: ".$e->getMessage();
+			self::$logger->error("Failed to open DB connection: {$ex->getMessage()}.");
+		}
+	}
+
+	public static function isConnected (): bool
+	{
+		if(is_null($this->pdo))
+		{
 			return false;
 		}
+
+		return true;
 	}
 
 	public static function query (string $sql, array $params = [], bool $isObject = false): array|object
 	{
-		if(is_null(self::$pdo))
+		if(!self::isConnected())
 		{
-			return NULL;
+			return [];
 		}
 
 		try
@@ -80,12 +81,14 @@ class Db
 		}
 	}
 
-	public static function exec (string $sql, array $params = []): object
+	public static function exec (string $sql, array $params = []): bool
 	{
-		if(is_null(self::$pdo))
+		if(!self::isConnected())
 		{
-			return NULL;
+			return false;
 		}
+
+
 	}
 
 	public static function commit (): void

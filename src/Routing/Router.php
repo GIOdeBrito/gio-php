@@ -54,16 +54,14 @@ class Router
 	{
 		if(!array_key_exists($method, $this->routes))
 		{
-			http_response_code(500);
-			echo 'Method not set';
-			die();
+			$this->logger->error("Could not add route {$route}: method {$method} does not exist.");
+			return;
 		}
 
 		if(!is_callable($callback))
 		{
-			http_response_code(500);
-			echo 'Callback function not set';
-			die();
+			$this->logger->error("Could not add route {$route}: callback function was not set.");
+			return;
 		}
 
 		$this->routes[$method][$route] = $callback;
@@ -76,7 +74,7 @@ class Router
 
 	public function call (): void
 	{
-		$req = new Request();
+		$req = new Request($this->logger);
 		$res = new Response($this->loader);
 
 		// Checks if the request method does exist in the router
@@ -101,11 +99,11 @@ class Router
 		// If route does not exists, redirects user to the 404 page
 		if(is_null($route))
 		{
-			$this->logger->warning("Route {$req->uri} not found");
+			$this->logger->warning("Route {$req->uri} not found.");
 			$res->redirect($this->notFoundPage);
 		}
 
-		$this->logger->info("Route {$req->uri} found");
+		$this->logger->info("Route {$req->uri} found.");
 
 		$this->routes[$req->method][$route]($req, $res);
 	}
