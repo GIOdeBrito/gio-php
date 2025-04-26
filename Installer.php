@@ -3,13 +3,13 @@
 // Make sure to run this file from the command prompt
 if(php_sapi_name() !== 'cli')
 {
-	die("Halted. Run this installer from the command prompt.");
+	echo "Halted. Run this installer from the command prompt.".PHP_EOL;
+	die();
 }
 
 echo "GioPHP Installer.".PHP_EOL;
 
-// https://github.com/GIOdeBrito/gio-php/releases/download/stable/gio-php-v1.0.0.tar.gz
-
+// Alter the version for the one to installer will fetch
 $VERSION = "1.0.0";
 
 echo "Fetching GioPHP standalone version: {$VERSION}.".PHP_EOL;
@@ -19,26 +19,47 @@ $url = "https://github.com/GIOdeBrito/gio-php/releases/download/stable/".$filena
 
 if(!file_put_contents("gio-php-v{$VERSION}.tar.gz", file_get_contents($url)))
 {
-	echo "Could not download compressed file.".PHP_EOL;
+	echo "Error: could not download file from repository.".PHP_EOL;
+	echo "Check if the desired version does exist or if it is currently available.".PHP_EOL;
+	die();
 }
 
-echo "Downloaded compressed file.".PHP_EOL;
+echo "Downloaded standalone file from Github repository.".PHP_EOL;
 
-// Decompress file
-$p = new PharData($filename);
-$p->decompress();
+try
+{
+	// Decompress file
+	$p = new PharData($filename);
+	$p->decompress();
 
-$phar = new PharData($filename);
-$phar->extractTo("temp_gio", "src/");
+	echo "File decompressed.".PHP_EOL;
 
-// Rename the source folder to GioPHP
-rename("temp_gio/src", "GioPHP");
-rmdir("temp_gio");
+	$tempDir = "__TEMPGIOPHP__";
 
-unlink($filename);
+	$phar = new PharData($filename);
+	$phar->extractTo($tempDir, "src/");
+
+	echo "Extracted file's content to the local directory.".PHP_EOL;
+
+	// Rename the source folder to GioPHP
+	rename("{$tempDir}/src", "GioPHP");
+	rmdir($tempDir);
+
+	echo "Removed temporary directory.".PHP_EOL;
+
+	unlink($filename);
+
+	echo "Removed original tar file.".PHP_EOL;
+}
+catch(Exception $ex)
+{
+	echo "Error: ".$ex->getMessage();
+	echo PHP_EOL;
+	die();
+}
 
 echo "Finished installation.".PHP_EOL;
 
-//echo PHP_EOL;
+echo "Hey, thanks for using GioPHP. Hope you also leave some feedback for me :D".PHP_EOL;
 
 ?>
