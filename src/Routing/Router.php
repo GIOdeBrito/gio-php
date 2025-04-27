@@ -75,7 +75,7 @@ class Router
 	public function call (): void
 	{
 		$req = new Request($this->logger);
-		$res = new Response($this->loader);
+		$res = new Response($this->loader, $this->logger);
 
 		// Checks if the request method does exist in the router
 		if(!array_key_exists($req->method, $this->routes))

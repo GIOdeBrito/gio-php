@@ -2,16 +2,10 @@
 
 namespace GioPHP\Http;
 
+use GioPHP\Enums\ResponseTypes;
+use GioPHP\Enums\ContentTypes;
 use GioPHP\Services\Loader;
-
-enum ResponseTypeEnum
-{
-	case VIEW;
-	case JSON;
-	case PLAINTEXT;
-	case HTML;
-	case EMPTY;
-}
+use GioPHP\Services\Logger;
 
 class Response
 {
@@ -20,21 +14,23 @@ class Response
 	private mixed $body;
 	private string $view;
 	private array $viewparams = [];
-	private ResponseTypeEnum $type;
+	private ContentTypes $type;
 
 	private Loader $loader;
+	private Logger $logger;
 
-	public function __construct (Loader $loader)
+	public function __construct (Loader $loader, Logger $logger)
 	{
 		$this->loader = $loader;
+		$this->logger = $logger;
 	}
 
 	public function render (string $view, array $params = []): void
 	{
 		$this->view = $view;
 		$this->viewparams = $params;
-		$this->contenttype = "text/html";
-		$this->type = ResponseTypeEnum::VIEW;
+		$this->contenttype = ContentTypes::HTML;
+		$this->type = ResponseTypes::VIEW;
 		$this->send();
 	}
 
@@ -46,37 +42,42 @@ class Response
 	public function html (string $body): void
 	{
 		$this->body = $body;
-		$this->contenttype = "text/html";
-		$this->type = ResponseTypeEnum::HTML;
+		$this->contenttype = ContentTypes::HTML;
+		$this->type = ResponseTypes::HTML;
 		$this->send();
 	}
 
 	public function json (array|object $data): void
 	{
 		$this->body = $data;
-		$this->contenttype = "application/json";
-		$this->type = ResponseTypeEnum::JSON;
+		$this->contenttype = ContentTypes::JSON;
+		$this->type = ResponseTypes::JSON;
 		$this->send();
 	}
 
 	public function plain (string $body): void
 	{
 		$this->body = $body;
-		$this->contenttype = "text/plain";
-		$this->type = ResponseTypeEnum::PLAINTEXT;
+		$this->contenttype = ContentTypes::PLAIN;
+		$this->type = ResponseTypes::PLAINTEXT;
+		$this->send();
+	}
+
+	public function file (string $path): void
+	{
+		$this->body = $path;
+		$this->contenttype = ContentTypes::FILE;
 		$this->send();
 	}
 
 	public function end (): void
 	{
-		$this->body = "";
-		$this->contenttype = "text/html";
-		$this->type = ResponseTypeEnum::EMPTY;
 		$this->send();
 	}
 
 	public function redirect (string $url): void
 	{
+		http_response_code(301);
 		header("Location: ${url}");
 		die();
 	}
@@ -88,43 +89,64 @@ class Response
 
 		switch($this->type)
 		{
-			case ResponseTypeEnum::VIEW:
-			{
-				// Get the view's content
-				ob_start();
-
-				include $this->loader->views."/{$this->view}.php";
-
-				$body = ob_get_clean();
-
-				//die($this->loader->layout);
-
-				// Extract the array key value pair as local variables
-				extract($this->viewparams);
-
-				// Load layout
-				include $this->loader->layout;
-			}
-			break;
-			case ResponseTypeEnum::JSON:
-			{
-				echo json_encode($this->body);
-			}
-			break;
-			case ResponseTypeEnum::HTML:
-			{
-				include 'App/Views/'.$this->body.'.php';
-			}
-			break;
-			case ResponseTypeEnum::PLAINTEXT:
-			default:
-			{
-				echo $this->body;
-			}
-			break;
+			case ResponseTypes::VIEW: 		$this->sendView(); break;
+			case ResponseTypes::JSON: 		$this->sendJson(); break;
+			case ResponseTypes::HTML: 		$this->sendHtml(); break;
+			case ResponseTypes::FILE: 		$this->sendFile(); break;
+			case ResponseTypes::PLAINTEXT: 	$this->sendPlain(); break;
 		}
 
 		die();
+	}
+
+	private function sendView (): void
+	{
+		try
+		{
+			// Get the view's content
+			ob_start();
+
+			include $this->loader->views."/{$this->view}.php";
+
+			$body = ob_get_clean();
+
+			// Extract the array key value pair as local variables
+			extract($this->viewparams);
+
+			// Load layout
+			include $this->loader->layout;
+		}
+		catch(\Exception $ex)
+		{
+			$this->logger->error($ex->getMessage());
+		}
+	}
+
+	private function sendJson (): void
+	{
+		echo json_encode($this->body ?? []);
+	}
+
+	private function sendHtml (): void
+	{
+		try
+		{
+			include "{$this->loader->views}/".$this->body.".php";
+		}
+		catch(\Exception $ex)
+		{
+			$this->logger->error($ex->getMessage());
+		}
+	}
+
+	private function sendFile (): void
+	{
+		readfile($this->body);
+	}
+
+	private function sendPlain (): void
+	{
+		echo $this->body ?? "";
 	}
 }
 

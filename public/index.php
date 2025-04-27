@@ -9,7 +9,7 @@ require 'Controllers/Home.php';
 $app = new GioPHPApp();
 
 $app->loader()->views = __DIR__."/Views";
-$app->loader()->layout = __DIR__."/Template/_layout.php";
+//$app->loader()->layout = __DIR__."/Template/_layout.php";
 $app->loader()->connectionString = "sqlite:".__DIR__.'/database.db';
 
 $app->router()->get('/public/', [Home::class, 'index']);
