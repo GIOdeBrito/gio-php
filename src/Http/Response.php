@@ -10,11 +10,10 @@ use GioPHP\Services\Logger;
 class Response
 {
 	private int $status = 200;
-	private string $contenttype = "";
+	private ContentTypes $contenttype;
 	private mixed $body;
 	private string $view;
 	private array $viewparams = [];
-	private ContentTypes $type;
 
 	private Loader $loader;
 	private Logger $logger;
@@ -85,7 +84,7 @@ class Response
 	private function send (): void
 	{
 		http_response_code(intval($this->status));
-		header('Content-Type: '.$this->contenttype);
+		header('Content-Type: '.$this->contenttype->value);
 
 		switch($this->type)
 		{
@@ -103,6 +102,11 @@ class Response
 	{
 		try
 		{
+			if(is_null($this->loader->views) || empty($this->loader->views))
+			{
+				throw new \Exception("Views path was not set.");
+			}
+
 			// Get the view's content
 			ob_start();
 

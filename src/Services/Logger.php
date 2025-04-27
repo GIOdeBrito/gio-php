@@ -47,6 +47,11 @@ class Logger
 	{
 		$this->log('WARNING', $message, $context);
 	}
+
+	public function error (string $message, array $context = []): void
+	{
+		$this->log('ERROR', $message, $context);
+	}
 }
 
 ?>

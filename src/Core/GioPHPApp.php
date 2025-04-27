@@ -7,6 +7,8 @@ use GioPHP\Services\Loader;
 use GioPHP\Services\Logger;
 use GioPHP\Abraxas\Db;
 
+define("SRC_ROOT_PATH", __DIR__.'/..');
+
 class GioPHPApp
 {
 	private ?Router $router = NULL;

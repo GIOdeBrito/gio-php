@@ -4,7 +4,7 @@ namespace GioPHP\Services;
 
 class Loader
 {
-	private string $views;
+	private string $views = "";
 	private string $layout;
 
 	private string $connectionString;
@@ -13,8 +13,7 @@ class Loader
 
 	public function __construct ()
 	{
-		$this->viewsPath = "App/Views";
-		$this->layoutPath = "App/Template/_layout.php";
+		$this->layout = constant("SRC_ROOT_PATH")."/Template/_layout.php";
 
 		$this->connectionString = "";
 		$this->dbLogin = NULL;
@@ -48,7 +47,7 @@ class Loader
 
 	private function layout (string $path): void
 	{
-		$this->layout = $path;
+		$this->layout = $view.'/'.$path;
 	}
 
 	private function connectionString (string $connection): void
