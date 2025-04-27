@@ -7,7 +7,7 @@ use GioPHP\Services\Loader;
 use GioPHP\Services\Logger;
 use GioPHP\Abraxas\Db;
 
-define("SRC_ROOT_PATH", __DIR__.'/..');
+define("GIOPHP_SRC_ROOT_PATH", __DIR__.'/..');
 
 class GioPHPApp
 {

@@ -13,7 +13,7 @@ class Loader
 
 	public function __construct ()
 	{
-		$this->layout = constant("SRC_ROOT_PATH")."/Template/_layout.php";
+		$this->layout = constant("GIOPHP_SRC_ROOT_PATH")."/Template/_layout.php";
 
 		$this->connectionString = "";
 		$this->dbLogin = NULL;
