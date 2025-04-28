@@ -4,53 +4,34 @@ namespace GioPHP\Services;
 
 class Logger
 {
-	private ?string $outputDir;
-
-	public function __construct (?string $outputPath = NULL)
+	private function log (string $level, string $message): void
 	{
-		$this->outputDir = $outputPath;
+		$now = date('Y-m-d H:i:s');
+
+		$loglevel = [
+			'INFO' 		=> LOG_INFO,
+			'WARNING' 	=> LOG_WARNING,
+			'ERROR' 	=> LOG_ERR
+		];
+
+		openlog('GioPHP', LOG_PID | LOG_PERROR, LOG_USER);
+		syslog($loglevel[$level], "[{$now}] $message");
+		closelog();
 	}
 
-	public function setLogPath (string $path): void
+	public function info (string $message): void
 	{
-		$this->outputDir = $path;
+		$this->log('INFO', $message);
 	}
 
-	private function log (string $level, string $message, array $context = []): void
+	public function warning (string $message): void
 	{
-		if(is_null($this->outputDir))
-		{
-			return;
-		}
-
-		$date = date('Y-m-d H:m:s');
-
-		$content = "[{$date}] [{$level}] {$message}";
-
-		if(!empty($context))
-		{
-			$flattened = implode(' ', $context);
-			$content .= " {$flattened}";
-		}
-
-		$content .= PHP_EOL;
-
-		file_put_contents($this->outputDir.'/log.txt', $content, FILE_APPEND | LOCK_EX);
+		$this->log('WARNING', $message);
 	}
 
-	public function info (string $message, array $context = []): void
+	public function error (string $message): void
 	{
-		$this->log('INFO', $message, $context);
-	}
-
-	public function warning (string $message, array $context = []): void
-	{
-		$this->log('WARNING', $message, $context);
-	}
-
-	public function error (string $message, array $context = []): void
-	{
-		$this->log('ERROR', $message, $context);
+		$this->log('ERROR', $message);
 	}
 }
 

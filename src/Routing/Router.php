@@ -30,22 +30,22 @@ class Router
 		$this->logger = $logger;
 	}
 
-	public function get (string $route, object|string|array $callback)
+	public function get (string $route, object|string|array $callback): void
 	{
 		$this->addRoute('GET', $route, $callback);
 	}
 
-	public function post (string $route, object|string|array $callback)
+	public function post (string $route, object|string|array $callback): void
 	{
 		$this->addRoute('POST', $route, $callback);
 	}
 
-	public function put (string $route, object|string|array $callback)
+	public function put (string $route, object|string|array $callback): void
 	{
 		$this->addRoute('PUT', $route, $callback);
 	}
 
-	public function delete (string $route, object|string|array $callback)
+	public function delete (string $route, object|string|array $callback): void
 	{
 		$this->addRoute('DELETE', $route, $callback);
 	}
@@ -67,7 +67,7 @@ class Router
 		$this->routes[$method][$route] = $callback;
 	}
 
-	public function setNotFound ($address)
+	public function set404 ($address): void
 	{
 		$this->notFoundPage = $address;
 	}

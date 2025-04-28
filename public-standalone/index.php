@@ -5,8 +5,7 @@ require __DIR__.'/../src/Core/Autoloader.php';
 use GioPHP\Core\GioPHPApp;
 
 $app = new GioPHPApp();
-//$app->loader()->views = __DIR__."/Views";
-$app->logger()->setLogPath(__DIR__.'/../logs');
+$app->loader()->views = __DIR__."/Views";
 
 $app->router()->get('/public-standalone/', function($req, $res)
 {
@@ -17,11 +16,12 @@ $app->router()->get('/public-standalone/', function($req, $res)
 	$res->render("Home", $viewData);
 });
 
-$app->router()->setNotFound('/public-standalone/404');
 $app->router()->get('/public-standalone/404', function($req, $res)
 {
 	echo "<h1>Not Found 404</h1>";
 });
+
+$app->router()->set404('/public-standalone/404');
 
 $app->run();
 

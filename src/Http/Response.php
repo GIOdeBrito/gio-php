@@ -71,6 +71,7 @@ class Response
 
 	public function end (): void
 	{
+		$this->contenttype = ContentTypes::PLAIN;
 		$this->send();
 	}
 
@@ -102,7 +103,9 @@ class Response
 	{
 		try
 		{
-			if(is_null($this->loader->views) || empty($this->loader->views))
+			$viewPath = $this->loader->views;
+
+			if(empty($viewPath))
 			{
 				throw new \Exception("Views path was not set.");
 			}
@@ -110,7 +113,7 @@ class Response
 			// Get the view's content
 			ob_start();
 
-			include $this->loader->views."/{$this->view}.php";
+			include $viewPath."/{$this->view}.php";
 
 			$body = ob_get_clean();
 
@@ -145,7 +148,14 @@ class Response
 
 	private function sendFile (): void
 	{
-		readfile($this->body);
+		try
+		{
+			readfile($this->body);
+		}
+		catch(\Exception $ex)
+		{
+			$this->logger->error($ex->getMessage());
+		}
 	}
 
 	private function sendPlain (): void
