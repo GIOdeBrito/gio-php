@@ -55,7 +55,7 @@ abstract class QueryBuilder
 		return $this;
 	}
 
-	public function and (string $column, string|int|float $operator, string|int|float|null $value = NULL): object
+	public function andWhere (string $column, string|int|float $operator, string|int|float|null $value = NULL): object
 	{
 		// The default operator is the equal sign
 		if(is_null($value))
@@ -70,17 +70,22 @@ abstract class QueryBuilder
 		return $this;
 	}
 
-	public function asc (...$tablenames): object
+	public function orderBy (...$tablenames): object
 	{
 		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
-		array_push($this->cmd, "ORDER BY {$tables} ASC");
+		array_push($this->cmd, "ORDER BY {$tables}");
 		return $this;
 	}
 
-	public function desc (...$tablenames): object
+	public function asc (): object
 	{
-		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
-		array_push($this->cmd, "ORDER BY {$tables} DESC");
+		array_push($this->cmd, "ASC");
+		return $this;
+	}
+
+	public function desc (): object
+	{
+		array_push($this->cmd, "DESC");
 		return $this;
 	}
 
@@ -103,7 +108,7 @@ abstract class QueryBuilder
 	}
 
 	// Returns the query as an object array
-	public function object (): array
+	public function toObject (): array
 	{
 		return Db::query($this->sql(), $this->sqlParams, true);
 	}

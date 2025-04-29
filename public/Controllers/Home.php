@@ -24,7 +24,12 @@ class Home
 
 		$user = new USERS();
 
-		$items = $user->select()->where('UNAME', 'GIORDANO')->and('ID', 1)->asc()->object();
+		$items = 	$user->select()
+					->where('UNAME', 'GIORDANO')
+					->andWhere('ID', 1)
+					->orderBy('ID')
+					->asc()
+					->toObject();
 
 		var_dump($items);
 

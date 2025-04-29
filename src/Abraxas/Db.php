@@ -39,7 +39,7 @@ class Db
 
 	public static function isConnected (): bool
 	{
-		if(is_null($this->pdo))
+		if(is_null(self::$pdo))
 		{
 			return false;
 		}
