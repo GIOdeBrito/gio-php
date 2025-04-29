@@ -4,6 +4,8 @@
 
 require __DIR__.'/../Models/Users.php';
 
+use GioPHP\Abraxas\Db;
+
 class Home
 {
 	public static function index ($req, $res): void
@@ -22,18 +24,17 @@ class Home
 			'title' => 'Db'
 		];
 
+		Db::open();
+		Db::exec("INSERT INTO USERS VALUES (?, ?, ?)", [ 2, 'BRUNO', '123' ]);
+		Db::commit();
+		Db::close();
+
 		$user = new USERS();
 
-		$items = 	$user->select()
-					->where('UNAME', 'GIORDANO')
-					->andWhere('ID', 1)
-					->orderBy('ID')
-					->asc()
-					->toObject();
+		$items = $user->all()->toObject();
 
 		var_dump($items);
 
-		//echo $user->select()->where('UNAME', 'GIORDANO')->and('ID', 1)->asc()->sql();
 		die();
 
 		$res->setStatus(200);

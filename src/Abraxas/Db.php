@@ -88,17 +88,37 @@ class Db
 			return false;
 		}
 
+		$res = self::$pdo->prepare($sql);
 
+		// Set SQL bindings
+		foreach($params as $i => $value)
+		{
+			$res->bindValue($i + 1, $value);
+		}
+
+		try
+		{
+			self::$pdo->beginTransaction();
+
+			$result = $res->execute();
+
+			return $result;
+		}
+		catch(\Exception $ex)
+		{
+			self::$logger->error($ex->getMessage());
+			return false;
+		}
 	}
 
 	public static function commit (): void
 	{
-		$this->pdo->commit();
+		self::$pdo->commit();
 	}
 
 	public static function rollback (): void
 	{
-		$this->pdo->rollback();
+		self::$pdo->rollback();
 	}
 
 	public static function close (): void

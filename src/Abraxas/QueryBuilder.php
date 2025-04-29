@@ -6,10 +6,13 @@ use GioPHP\Abraxas\Db;
 
 abstract class QueryBuilder
 {
-	private array $cmd = [];
 	private string $table;
-	private array $properties;
+
+	private array $cmd = [];
 	private array $sqlParams = [];
+
+	private array $properties = [];
+	private array $propertyNames = [];
 
 	public function __construct (string $table, array $properties = [])
 	{
@@ -17,6 +20,11 @@ abstract class QueryBuilder
 
 		$this->table = $table;
 		$this->properties = $properties;
+
+		foreach($this->properties as $item)
+		{
+			array_push($this->propertyNames, $item->name);
+		}
 	}
 
 	public function __destruct ()
@@ -24,12 +32,12 @@ abstract class QueryBuilder
 		Db::close();
 	}
 
-	// Basic SELECT statement
-	public function select (...$columns): object
+	// SELECT statement
+	private function select (...$columns): object
 	{
 		if(is_null($columns) || empty($columns))
 		{
-			$columns = implode(',', $this->properties);
+			$columns = implode(',', $this->propertyNames);
 		}
 		else
 		{
@@ -42,6 +50,11 @@ abstract class QueryBuilder
 
 	public function where (string $column, string|int|float $operator, string|int|float|null $value = NULL): object
 	{
+		if(count($this->cmd) === 0)
+		{
+			$this->select();
+		}
+
 		// The default operator is the equal sign
 		if(is_null($value))
 		{
@@ -72,6 +85,11 @@ abstract class QueryBuilder
 
 	public function orderBy (...$tablenames): object
 	{
+		if(count($this->cmd) === 0)
+		{
+			$this->select();
+		}
+
 		$tables = empty($tablenames) ? 1 : implode(',', $tablenames);
 		array_push($this->cmd, "ORDER BY {$tables}");
 		return $this;
@@ -97,8 +115,19 @@ abstract class QueryBuilder
 	// Gets first item from query
 	public function first (): array|object
 	{
+		if(count($this->cmd) === 0)
+		{
+			$this->select();
+		}
+
 		array_push($this->cmd, "LIMIT 1");
 		return Db::query($this->sql(), $this->sqlParams);
+	}
+
+	public function all (): array|object
+	{
+		$this->select();
+		return $this;
 	}
 
 	// Performs the query
@@ -111,6 +140,12 @@ abstract class QueryBuilder
 	public function toObject (): array
 	{
 		return Db::query($this->sql(), $this->sqlParams, true);
+	}
+
+	// INSERT/UPDATE statement
+	public function save (): void
+	{
+
 	}
 }
 

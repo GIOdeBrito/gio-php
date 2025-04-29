@@ -12,9 +12,7 @@ RUN php composer.phar install
 # Enables the rewrite module for .htaccess
 RUN a2enmod rewrite
 
-# Create logs folder and set Apache as its owner
-RUN mkdir logs
-RUN chown -R www-data:www-data logs
+RUN chown -R www-data:www-data public
 
 # Create a standalone release package
 #RUN tar -czvf gio-php-v$(cat VERSION).tar.gz src/

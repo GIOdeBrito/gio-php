@@ -30,7 +30,7 @@ abstract class Model extends QueryBuilder
 
 		foreach($properties as $item)
 		{
-		    array_push($this->properties, $item->name);
+			array_push($this->properties, (object)[ 'name' => $item->name, 'value' => $this->{$item->name} ]);
 		}
 	}
 }
