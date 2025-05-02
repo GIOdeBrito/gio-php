@@ -29,11 +29,11 @@ class Db
 		{
 			self::$pdo = new \PDO($connection, $login, $pwd);
 			self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			self::$logger->info("DB successfully connected.");
+			self::$logger->info("Connected to database.");
 		}
 		catch(\PDOException $ex)
 		{
-			self::$logger->error("Failed to open DB connection: {$ex->getMessage()}.");
+			self::$logger->error("Failed to open database connection: {$ex->getMessage()}.");
 		}
 	}
 
@@ -58,10 +58,10 @@ class Db
 		{
 			$res = self::$pdo->prepare($sql);
 
-			// Set SQL bindings
-			foreach($params as $i => $value)
+			// Set param binds
+			if(count($params) > 0)
 			{
-				$res->bindValue($i + 1, $value);
+				self::setPDOBinds($res, $params);
 			}
 
 			$res->execute();
@@ -88,17 +88,17 @@ class Db
 			return false;
 		}
 
-		$res = self::$pdo->prepare($sql);
-
-		// Set SQL bindings
-		foreach($params as $i => $value)
-		{
-			$res->bindValue($i + 1, $value);
-		}
-
 		try
 		{
+			$res = self::$pdo->prepare($sql);
+
 			self::$pdo->beginTransaction();
+
+			// Set param binds
+			if(count($params) > 0)
+			{
+				self::setPDOBinds($res, $params);
+			}
 
 			$result = $res->execute();
 
@@ -108,6 +108,31 @@ class Db
 		{
 			self::$logger->error($ex->getMessage());
 			return false;
+		}
+	}
+
+	private static function setPDOBinds (\PDOStatement $statement, array $params): void
+	{
+		// Sequential bindings
+		if(array_is_list($params))
+		{
+			foreach($params as $i => $value)
+			{
+				$statement->bindValue($i + 1, $value);
+			}
+
+			return;
+		}
+
+		// Associative bindings
+		foreach($params as $key => $value)
+		{
+			if(!str_starts_with($key, ':'))
+			{
+				$key = ':'.$key;
+			}
+
+			$statement->bindValue($key, $value);
 		}
 	}
 

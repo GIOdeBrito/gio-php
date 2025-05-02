@@ -141,12 +141,6 @@ abstract class QueryBuilder
 	{
 		return Db::query($this->sql(), $this->sqlParams, true);
 	}
-
-	// INSERT/UPDATE statement
-	public function save (): void
-	{
-
-	}
 }
 
 ?>

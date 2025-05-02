@@ -25,7 +25,7 @@ class Home
 		];
 
 		Db::open();
-		Db::exec("INSERT INTO USERS VALUES (?, ?, ?)", [ 2, 'BRUNO', '123' ]);
+		Db::exec("INSERT INTO USERS VALUES (:idd, :name, :num)", [ 'idd' => 2, 'name' => 'BRUNO', 'num' => 123 ]);
 		Db::commit();
 		Db::close();
 
@@ -33,7 +33,12 @@ class Home
 
 		$items = $user->all()->toObject();
 
-		var_dump($items);
+		foreach($items as $item)
+		{
+			echo $item->ID.PHP_EOL;
+			echo $item->UNAME.PHP_EOL;
+			echo $item->UPWD.PHP_EOL;
+		}
 
 		die();
 

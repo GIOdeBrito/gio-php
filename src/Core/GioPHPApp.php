@@ -41,8 +41,7 @@ class GioPHPApp
 
 	public function run (): void
 	{
-		$this->logger->info("Application was started.");
-
+		//$this->logger->info("Application was started.");
 		$this->router->call();
 		die();
 	}
