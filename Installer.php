@@ -15,7 +15,7 @@ $VERSION = "1.0.2";
 echo "Fetching GioPHP standalone version: {$VERSION}.".PHP_EOL;
 
 $filename = "gio-php-v{$VERSION}.tar.gz";
-$url = "https://github.com/GIOdeBrito/gio-php/releases/download/stable/".$filename;
+$url = "https://github.com/GIOdeBrito/gio-php/releases/download/{$VERSION}/".$filename;
 
 if(!file_put_contents("gio-php-v{$VERSION}.tar.gz", file_get_contents($url)))
 {
