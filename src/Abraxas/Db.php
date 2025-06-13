@@ -9,37 +9,44 @@ use GioPHP\Services\Logger;
 
 class Db
 {
-	private static ?\PDO $pdo = NULL;
-	private static Loader $loader;
-	private static Logger $logger;
+	private ?\PDO $pdo = NULL;
+	private Loader $loader;
+	private Logger $logger;
 
-	public static function constructor (Loader $loader, Logger $logger): void
+	public function __construct (Loader $loader, Logger $logger)
 	{
-		self::$loader = $loader;
-		self::$logger = $logger;
+		$this->loader = $loader;
+		$this->logger = $logger;
 	}
 
-	public static function open (): void
+	public function __destruct ()
 	{
-		$connection = self::$loader->connectionString;
-		$login = self::$loader->dbLogin;
-		$pwd = self::$loader->dbPwd;
+		$this->close();
+	}
+
+	public function open (): bool
+	{
+		$connection = $this->loader->connectionString;
+		$login = $this->loader->dbLogin;
+		$pwd = $this->loader->dbPwd;
 
 		try
 		{
-			self::$pdo = new \PDO($connection, $login, $pwd);
-			self::$pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-			self::$logger->info("Connected to database.");
+			$this->pdo = new \PDO($connection, $login, $pwd);
+			$this->pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+			$this->logger->info("Connected to database.");
+			return true;
 		}
 		catch(\PDOException $ex)
 		{
-			self::$logger->error("Failed to open database connection: {$ex->getMessage()}.");
+			$this->logger->error("Failed to open database connection: {$ex->getMessage()}.");
+			return false;
 		}
 	}
 
-	public static function isConnected (): bool
+	public function isConnected (): bool
 	{
-		if(is_null(self::$pdo))
+		if(is_null($this->pdo))
 		{
 			return false;
 		}
@@ -47,21 +54,21 @@ class Db
 		return true;
 	}
 
-	public static function query (string $sql, array $params = [], bool $isObject = false): array|object
+	public function query (string $sql, array $params = [], bool $isObject = false): array|object
 	{
-		if(!self::isConnected())
+		if(!$this->isConnected())
 		{
 			return [];
 		}
 
 		try
 		{
-			$res = self::$pdo->prepare($sql);
+			$res = $this->pdo->prepare($sql);
 
 			// Set param binds
 			if(count($params) > 0)
 			{
-				self::setPDOBinds($res, $params);
+				$this->setPDOBinds($res, $params);
 			}
 
 			$res->execute();
@@ -81,7 +88,7 @@ class Db
 		}
 	}
 
-	public static function exec (string $sql, array $params = []): bool
+	public function exec (string $sql, array $params = []): bool
 	{
 		if(!self::isConnected())
 		{
@@ -90,14 +97,14 @@ class Db
 
 		try
 		{
-			$res = self::$pdo->prepare($sql);
+			$res = $this->pdo->prepare($sql);
 
-			self::$pdo->beginTransaction();
+			$this->pdo->beginTransaction();
 
 			// Set param binds
 			if(count($params) > 0)
 			{
-				self::setPDOBinds($res, $params);
+				$this->setPDOBinds($res, $params);
 			}
 
 			$result = $res->execute();
@@ -106,12 +113,12 @@ class Db
 		}
 		catch(\Exception $ex)
 		{
-			self::$logger->error($ex->getMessage());
+			$this->logger->error($ex->getMessage());
 			return false;
 		}
 	}
 
-	private static function setPDOBinds (\PDOStatement $statement, array $params): void
+	private function setPDOBinds (\PDOStatement $statement, array $params): void
 	{
 		// Sequential bindings
 		if(array_is_list($params))
@@ -136,19 +143,19 @@ class Db
 		}
 	}
 
-	public static function commit (): void
+	public function commit (): void
 	{
-		self::$pdo->commit();
+		$this->pdo->commit();
 	}
 
-	public static function rollback (): void
+	public function rollback (): void
 	{
-		self::$pdo->rollback();
+		$this->pdo->rollback();
 	}
 
-	public static function close (): void
+	public function close (): void
 	{
-		self::$pdo = NULL;
+		$this->pdo = NULL;
 	}
 }
 

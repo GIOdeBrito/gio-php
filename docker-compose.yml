@@ -4,6 +4,10 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+        volumes:
+            - ./public:/var/www/html/public
+            - ./src:/var/www/html/src
+            - ./public-standalone:/var/www/html/public-standalone
         ports:
             - "3000:80"
         tty: true

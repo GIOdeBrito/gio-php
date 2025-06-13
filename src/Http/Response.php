@@ -138,7 +138,8 @@ class Response
 	{
 		try
 		{
-			include "{$this->loader->views}/".$this->body.".php";
+			//include "{$this->loader->views}/".$this->body.".php";
+			echo $this->body;
 		}
 		catch(\Exception $ex)
 		{

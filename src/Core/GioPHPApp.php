@@ -14,14 +14,15 @@ class GioPHPApp
 	private ?Router $router = NULL;
 	private ?Loader $loader = NULL;
 	private ?Logger $logger = NULL;
+	private ?Db $db = NULL;
 
 	public function __construct ()
 	{
 		$this->logger = new Logger();
 		$this->loader = new Loader();
-		$this->router = new Router($this->loader, $this->logger);
 
-		Db::constructor($this->loader, $this->logger);
+		$this->db = new Db($this->loader, $this->logger);
+		$this->router = new Router($this->loader, $this->logger, $this->db);
 	}
 
 	public function logger (): object
@@ -41,7 +42,6 @@ class GioPHPApp
 
 	public function run (): void
 	{
-		//$this->logger->info("Application was started.");
 		$this->router->call();
 		die();
 	}
