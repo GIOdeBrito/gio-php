@@ -1,7 +1,5 @@
 <?php
 
-//use GioPHP\Core\Controller;
-
 require __DIR__.'/../Models/Users.php';
 
 use GioPHP\MVC\Controller;

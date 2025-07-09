@@ -2,10 +2,8 @@
 
 namespace GioPHP\Routing;
 
-use GioPHP\Http\Request;
-use GioPHP\Http\Response;
-use GioPHP\Services\Loader;
-use GioPHP\Services\Logger;
+use GioPHP\Http\{Request, Response};
+use GioPHP\Services\{Loader, Logger, ComponentRegistry};
 use GioPHP\Abraxas\Db;
 
 class Router
@@ -16,8 +14,9 @@ class Router
 	private Loader $loader;
 	private Logger $logger;
 	private Db $db;
+	private ComponentRegistry $components;
 
-	public function __construct (Loader $loader, Logger $logger, Db $db)
+	public function __construct (Loader $loader, Logger $logger, Db $db, ComponentRegistry $components)
 	{
 		$this->routes = [
 			'GET' 		=> [],
@@ -31,6 +30,7 @@ class Router
 		$this->loader = $loader;
 		$this->logger = $logger;
 		$this->db = $db;
+		$this->components = $components;
 	}
 
 	public function get (string $route, object|string|array $callback): void
@@ -61,7 +61,7 @@ class Router
 	public function call (): void
 	{
 		$req = new Request($this->logger);
-		$res = new Response($this->loader, $this->logger);
+		$res = new Response($this->loader, $this->logger, $this->components);
 
 		// Checks if the request method does exist in the router
 		if(!array_key_exists($req->method, $this->routes))
@@ -101,7 +101,6 @@ class Router
 			$method = $func[1];
 
 			$controller->{$method}($req, $res);
-
 			return;
 		}
 

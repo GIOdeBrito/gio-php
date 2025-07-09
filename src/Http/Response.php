@@ -2,10 +2,9 @@
 
 namespace GioPHP\Http;
 
-use GioPHP\Enums\ResponseTypes;
-use GioPHP\Enums\ContentTypes;
-use GioPHP\Services\Loader;
-use GioPHP\Services\Logger;
+use GioPHP\Enums\{ResponseTypes, ContentTypes};
+use GioPHP\Services\{Loader, Logger, ComponentRegistry};
+use GioPHP\View\ViewRenderer;
 
 class Response
 {
@@ -17,11 +16,13 @@ class Response
 
 	private Loader $loader;
 	private Logger $logger;
+	private ComponentRegistry $components;
 
-	public function __construct (Loader $loader, Logger $logger)
+	public function __construct (Loader $loader, Logger $logger, ComponentRegistry $components)
 	{
 		$this->loader = $loader;
 		$this->logger = $logger;
+		$this->components = $components;
 	}
 
 	public function render (string $view, array $params = []): void
@@ -110,12 +111,17 @@ class Response
 				throw new \Exception("Views path was not set.");
 			}
 
+			$viewrenderer = new ViewRenderer($this->components);
+			$viewrenderer->beginCapture();
+
 			// Get the view's content
-			ob_start();
+			//ob_start();
 
 			include $viewPath."/{$this->view}.php";
 
-			$body = ob_get_clean();
+			//$body = ob_get_clean();
+			$viewrenderer->endCapture();
+			$viewrenderer->setComponentsForElements();
 
 			// Extract the array key value pair as local variables
 			extract($this->viewparams);
