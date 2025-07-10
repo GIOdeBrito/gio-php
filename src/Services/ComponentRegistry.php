@@ -4,7 +4,18 @@ namespace GioPHP\Services;
 
 class ComponentRegistry
 {
+	private bool $useComponents = false;
 	private array $registeredComponents = [];
+
+	public function useComponents ($value): void
+	{
+		$this->useComponents = $value;
+	}
+
+	public function isUsingComponents (): bool
+	{
+		return $this->useComponents;
+	}
 
 	public function register (string $tagName, string|array|object $callback)
 	{

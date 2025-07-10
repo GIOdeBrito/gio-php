@@ -20,7 +20,7 @@ class Home extends Controller
 			'title' => 'Home'
 		];
 
-		var_dump($this->db);
+		//var_dump($this->db);
 
 		$res->setStatus(200);
 		$res->render('Home', $viewData);

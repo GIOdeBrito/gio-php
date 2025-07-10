@@ -117,11 +117,23 @@ class Response
 			// Get the view's content
 			//ob_start();
 
-			include $viewPath."/{$this->view}.php";
+			$viewFilePath = $viewPath."/{$this->view}.php";
+
+			if(!file_exists($viewFilePath))
+			{
+				throw new \Exception("Could not find view file.");
+			}
+
+			include $viewFilePath;
 
 			//$body = ob_get_clean();
 			$viewrenderer->endCapture();
-			$viewrenderer->setComponentsForElements();
+
+			// Replace components if allowed
+			if($this->components->isUsingComponents())
+			{
+				$viewrenderer->setComponentsForElements();
+			}
 
 			// Extract the array key value pair as local variables
 			extract($this->viewparams);

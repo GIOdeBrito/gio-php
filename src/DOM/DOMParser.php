@@ -4,16 +4,16 @@ namespace GioPHP\DOM;
 
 class DOMParser
 {
-	private object $objectModel;
+	private object $DOM;
 	private string $htmlContent;
 
 	public function __construct (string $html)
 	{
 		$this->htmlContent = $html;
-		$this->objectModel = $this->stringToDOM($html);
+		$this->DOM = $this->stringToDOMDocument($html);
 	}
 
-	private function stringToDOM (string $html): object
+	private function stringToDOMDocument (string $html): object
 	{
 		$document = new \DOMDocument();
         libxml_use_internal_errors(true);
@@ -23,9 +23,65 @@ class DOMParser
         return $document;
 	}
 
-	public function save (): string
+	public function stringToNode (string $html): object
 	{
+		$dom = $this->stringToDOMDocument($html);
 
+		return $dom->importNode($dom->firstChild, true);
+	}
+
+	public function domNodeOuterHtml (object $node): string
+	{
+		if(is_null($node->ownerDocument))
+		{
+			return $node->firstChild->ownerDocument->saveXML($node->firstChild);
+		}
+
+		return $node->ownerDocument->saveXML($node);
+	}
+
+	public function domNodeInnerHtml (object $node): string
+	{
+		return implode(' ', array_map(fn($child) => $this->domNodeOuterHtml($child), $node->childNodes));
+
+		/*return;
+		$html = [];
+
+		foreach($node->childNodes as $child)
+		{
+			array_push($html, $this->domNodeOuterHtml($child));
+		}
+
+		return implode(' ', $html);*/
+	}
+
+	public function getNodeTuple (array $tags = []): array
+	{
+		if(empty($tags))
+		{
+			return [];
+		}
+
+		$document = $this->DOM;
+		$nodeLists = array_map(fn($tagName) => iterator_to_array($document->getElementsByTagName($tagName)), $tags);
+
+		return array_merge($nodeLists);
+	}
+
+	public function replaceNode (object $node, string $replacement)
+	{
+		$replacement = $this->stringToNode('<button>Teste</button>');
+
+		//$replacement = $this->domNodeOuterHtml($replacement);
+
+		//var_dump($node);
+
+		$this->DOM->replaceChild($node, $replacement);
+	}
+
+	public function domToHTML (): string
+	{
+		return $this->domNodeInnerHtml($this->DOM)->saveHTML();
 	}
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-$app->components()->register('ButtonIcon', function ($value, $icon, $attributes)
+$app->components()->register('button-icon', function ($value, $icon, $attributes)
 {
 	?>
 	<button <?= $attributes ?>>
