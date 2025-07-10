@@ -42,7 +42,7 @@ class DOMParser
 
 	public function domNodeInnerHtml (object $node): string
 	{
-		return implode(' ', array_map(fn($child) => $this->domNodeOuterHtml($child), $node->childNodes));
+		return implode(' ', array_map(fn($child) => $this->domNodeOuterHtml($child), iterator_to_array($node->firstChild->childNodes)));
 
 		/*return;
 		$html = [];
@@ -65,23 +65,39 @@ class DOMParser
 		$document = $this->DOM;
 		$nodeLists = array_map(fn($tagName) => iterator_to_array($document->getElementsByTagName($tagName)), $tags);
 
-		return array_merge($nodeLists);
+		$nodeTuple = [];
+
+		foreach($nodeLists as $list)
+		{
+			foreach ($list as $item)
+			{
+				array_push($nodeTuple, $item);
+			}
+		}
+
+		return $nodeTuple;
 	}
 
-	public function replaceNode (object $node, string $replacement)
+	public function replaceNode (object $node, object|string $replacement)
 	{
-		$replacement = $this->stringToNode('<button>Teste</button>');
+		$newNode = $replacement;
 
-		//$replacement = $this->domNodeOuterHtml($replacement);
+		if(gettype($replacement) === "string")
+		{
+			$newNode = $this->stringToNode($replacement);
+		}
 
-		//var_dump($node);
+		// Import new node into the DOM
+		$newNode = $this->DOM->importNode($newNode, true);
 
-		$this->DOM->replaceChild($node, $replacement);
+		// Replace the old node
+		$node->parentNode->replaceChild($newNode, $node);
 	}
 
 	public function domToHTML (): string
 	{
-		return $this->domNodeInnerHtml($this->DOM)->saveHTML();
+		// Returns the view content without the root div
+		return $this->domNodeInnerHtml($this->DOM);
 	}
 }
 

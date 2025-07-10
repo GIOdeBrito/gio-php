@@ -5,3 +5,7 @@
 <button-icon>
 	Teste
 </button-icon>
+
+<button-icon-2>
+	Teste 2
+</button-icon-2>

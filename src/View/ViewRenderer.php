@@ -22,7 +22,7 @@ class ViewRenderer
 	public function beginCapture (): void
 	{
 		ob_start();
-		echo '<div id="gphpview-root"></div>';
+		echo '<div data-name="gphpview-root"></div>';
 	}
 
 	public function endCapture (): void
@@ -44,21 +44,33 @@ class ViewRenderer
 	{
 		$parser = new DOMParser($this->htmlContent);
 
-		$customTags = array_keys($this->components->getComponents());
+		$components = $this->components->getComponents();
+
+		$customTags = array_keys($components);
 		$nodes = $parser->getNodeTuple($customTags);
 
-		//var_dump($nodes);
+		//var_dump($customTags);
 
-		foreach($nodes as $nodeList)
+		foreach($nodes as $node)
 		{
-var_dump($nodeList);
+			$tagName = trim($node->localName);
 
-			foreach($nodeList as $node) {
-				$parser->replaceNode($node, '');
+			$replacement = NULL;
+
+			if(!isset($components[$tagName]))
+			{
+				continue;
 			}
+
+			ob_start();
+			call_user_func_array($components[$tagName], []);
+			$element = ob_get_clean();
+
+			$parser->replaceNode($node, $element);
 		}
 
-		echo htmlspecialchars($parser->domToHTML());
+		//echo htmlspecialchars($parser->domToHTML());
+		echo $parser->domToHTML();
 	}
 }
 
