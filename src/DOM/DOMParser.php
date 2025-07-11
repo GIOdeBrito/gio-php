@@ -94,6 +94,35 @@ class DOMParser
 		$node->parentNode->replaceChild($newNode, $node);
 	}
 
+	public static function getNodeAttributes (object $node, string $customPrefix = NULL): object
+	{
+		$localAttr = iterator_to_array($node->attributes);
+
+		$nodeAttr = [
+			'attribute' => [],
+			'custom' => []
+		];
+
+		array_walk($localAttr, function ($item, $key) use (&$nodeAttr, $customPrefix)
+		{
+			if(!is_null($customPrefix) && str_starts_with($key, $customPrefix))
+			{
+				$customKey = str_replace($customPrefix, '', $key);
+				$nodeAttr['custom'][$customKey] = trim($item->value);
+				return;
+			}
+
+			$nodeAttr['attribute'][$key] = trim($item->value);
+		});
+
+		return (object) $nodeAttr;
+	}
+
+	public static function getNodeInnerText (object $node): string
+	{
+		return trim($node->textContent) ?? trim($node->nodeValue);
+	}
+
 	public function domToHTML (): string
 	{
 		// Returns the view content without the root div

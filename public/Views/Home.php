@@ -2,10 +2,4 @@
 
 <p>This comes from a View!</p>
 
-<button-icon>
-	Teste
-</button-icon>
-
-<button-icon-2>
-	Teste 2
-</button-icon-2>
+<button-icon g:icon="teste.webp" id="button1" class="b b-primary">Teste</button-icon>

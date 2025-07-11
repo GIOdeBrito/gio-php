@@ -49,28 +49,49 @@ class ViewRenderer
 		$customTags = array_keys($components);
 		$nodes = $parser->getNodeTuple($customTags);
 
-		//var_dump($customTags);
-
 		foreach($nodes as $node)
 		{
 			$tagName = trim($node->localName);
-
-			$replacement = NULL;
 
 			if(!isset($components[$tagName]))
 			{
 				continue;
 			}
 
-			ob_start();
-			call_user_func_array($components[$tagName], []);
-			$element = ob_get_clean();
+			// Store the component's content into the buffer
+			$element = $this->createElement($node, $components[$tagName]);
 
 			$parser->replaceNode($node, $element);
 		}
 
 		//echo htmlspecialchars($parser->domToHTML());
 		echo $parser->domToHTML();
+	}
+
+	public function createElement ($node, $componentCallback)
+	{
+		$attr = DOMParser::getNodeAttributes($node, 'g:');
+
+		$attrKvp = [];
+
+		array_walk($attr->attribute, function ($value, $key) use (&$attrKvp)
+		{
+			array_push($attrKvp, "{$key}=\"{$value}\"");
+		});
+
+		$attributes = implode(' ', $attrKvp);
+		$value = DOMParser::getNodeInnerText($node);
+		$custom = $attr->custom ?? [];
+
+		// Create element in a limited context
+		return (function() use ($componentCallback, $value, $custom, $attributes)
+		{
+			$args = [ 'value' => $value, ...$custom, 'attributes' => $attributes ];
+
+			ob_start();
+			call_user_func_array($componentCallback, $args);
+			return ob_get_clean();
+		})();
 	}
 }
 
