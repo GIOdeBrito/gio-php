@@ -28,8 +28,6 @@ $app->router()->set404('/public/404');
 
 $app->components()->useComponents(true);
 
-include __DIR__.'/Components/button-icon.php';
-
 $app->run();
 
 ?>
