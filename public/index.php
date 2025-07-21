@@ -1,12 +1,14 @@
 <?php
 
+define('ABSPATH', __DIR__);
+
 require __DIR__.'/../vendor/autoload.php';
 
-use GioPHP\Core\GioPHPApp;
+use GioPHP\Core\GioPHPApp as App;
 
 require 'Controllers/Home.php';
 
-$app = new GioPHPApp();
+$app = new App();
 
 # // TODO: Switch from named functions to a generic set. Ex: ->set('views', path)
 
@@ -27,6 +29,8 @@ $app->router()->get('/public/param/:name', function($req)
 $app->router()->set404('/public/404');
 
 $app->components()->useComponents(true);
+
+require constant('ABSPATH').'/Components/button-icon.php';
 
 $app->run();
 

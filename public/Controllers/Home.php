@@ -5,21 +5,17 @@ require __DIR__.'/../Models/Users.php';
 use GioPHP\MVC\Controller;
 use GioPHP\Abraxas\Db;
 
-// components
-include __DIR__.'/../Components/button-icon.php';
+//include constant('ABSPATH').'/Components/button-icon.php';
 
 class Home extends Controller
 {
 	private $db = NULL;
 
-	public function __construct ($db)
+	public function __construct ($db, $components)
 	{
 		$this->db = $db;
 
-		if(function_exists('ButtonIcon'))
-		{
-			echo "botão";
-		}
+
 	}
 
 	public function index ($req, $res): void

@@ -49,6 +49,8 @@ class ViewRenderer
 		$customTags = array_keys($components);
 		$nodes = $parser->getNodeTuple($customTags);
 
+		//$tags = $parser?->getTagNames();
+
 		foreach($nodes as $node)
 		{
 			$tagName = trim($node->localName);
@@ -65,7 +67,9 @@ class ViewRenderer
 		}
 
 		//echo htmlspecialchars($parser->domToHTML());
-		echo $parser->domToHTML();
+		//echo $parser->domToHTML();
+
+		$this->htmlContent = $parser->domToHTML();
 	}
 
 	public function createElement ($node, $componentCallback)
@@ -92,6 +96,11 @@ class ViewRenderer
 			call_user_func_array($componentCallback, $args);
 			return ob_get_clean();
 		})();
+	}
+
+	public function getHtml (): string
+	{
+		return $this->htmlContent;
 	}
 }
 

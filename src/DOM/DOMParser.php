@@ -78,6 +78,22 @@ class DOMParser
 		return $nodeTuple;
 	}
 
+	public function getTagNames (): array
+	{
+		$document = $this->DOM;
+
+		$nodeList = iterator_to_array($document->getElementsByTagName('*'));
+
+		$tags = [];
+
+		array_walk($nodeList, function ($item) use (&$tags)
+		{
+			array_push($tags, $item->tagName);
+		});
+
+		return array_unique($tags);
+	}
+
 	public function replaceNode (object $node, object|string $replacement)
 	{
 		$newNode = $replacement;

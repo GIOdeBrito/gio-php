@@ -102,39 +102,38 @@ class Response
 
 	private function sendView (): void
 	{
+		$viewPath = $this->loader->views;
+
+		if(empty($viewPath))
+		{
+			throw new \Exception("Views path was not set.");
+		}
+
+		$viewrenderer = new ViewRenderer($this->components);
+		$viewrenderer->beginCapture();
+
+		$viewFilePath = $viewPath."/{$this->view}.php";
+
+		if(!file_exists($viewFilePath))
+		{
+			throw new \Exception("Could not find view file.");
+		}
+
+		include $viewFilePath;
+
+		//$body = ob_get_clean();
+		$viewrenderer->endCapture();
+
+		// Replace components if allowed
+		if($this->components->isUsingComponents())
+		{
+			$viewrenderer->setComponentsForElements();
+		}
+
+		$body = $viewrenderer->getHtml();
+
 		try
 		{
-			$viewPath = $this->loader->views;
-
-			if(empty($viewPath))
-			{
-				throw new \Exception("Views path was not set.");
-			}
-
-			$viewrenderer = new ViewRenderer($this->components);
-			$viewrenderer->beginCapture();
-
-			// Get the view's content
-			//ob_start();
-
-			$viewFilePath = $viewPath."/{$this->view}.php";
-
-			if(!file_exists($viewFilePath))
-			{
-				throw new \Exception("Could not find view file.");
-			}
-
-			include $viewFilePath;
-
-			//$body = ob_get_clean();
-			$viewrenderer->endCapture();
-
-			// Replace components if allowed
-			if($this->components->isUsingComponents())
-			{
-				$viewrenderer->setComponentsForElements();
-			}
-
 			// Extract the array key value pair as local variables
 			extract($this->viewparams);
 
@@ -143,7 +142,7 @@ class Response
 		}
 		catch(\Exception $ex)
 		{
-			$this->logger->error($ex->getMessage());
+			$this?->logger?->error($ex?->getMessage());
 		}
 	}
 

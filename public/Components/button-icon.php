@@ -1,7 +1,5 @@
 <?php
 
-
-
 function ButtonIcon ($value = '', $icon = '', $attributes = '')
 {
 	?>
@@ -12,6 +10,6 @@ function ButtonIcon ($value = '', $icon = '', $attributes = '')
 	<?php
 }
 
-//$app->components()->register('button-icon', 'ButtonIcon');
+$app->components()->register('button-icon', 'ButtonIcon');
 
 ?>

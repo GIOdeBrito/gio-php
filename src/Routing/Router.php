@@ -85,11 +85,11 @@ class Router
 		// If route does not exists, redirects user to the 404 page
 		if(is_null($route))
 		{
-			$this->logger->warning("Route {$req->uri} not found.");
+			$this->logger->warning("Route: {$req->uri}, was not found.");
 			$res->redirect($this->notFoundPage);
 		}
 
-		$this->logger->info("Route {$req->uri} found.");
+		$this->logger->info("Route: {$req->uri}, was not found.");
 
 		// Callback function
 		$func = $this->routes[$req->method][$route];
@@ -112,7 +112,7 @@ class Router
 	{
 		if(!array_key_exists($method, $this->routes))
 		{
-			$this->logger->error("Could not add route {$route}: method {$method} does not exist.");
+			$this->logger->error("Could not add route {$route}: method '{$method}' does not exist.");
 			return;
 		}
 
@@ -137,8 +137,9 @@ class Router
 
 		// Available parameters for the controller's constructor
 		$possibleParameters = [
-			'db' 		=> $this->db,
-			'logger' 	=> $this->logger
+			'db' 			=> $this->db,
+			'logger' 		=> $this->logger,
+			'components' 	=> $this->components
 		];
 
 		$controllerParams = [];
