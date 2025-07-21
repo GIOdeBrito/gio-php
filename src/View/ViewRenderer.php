@@ -46,6 +46,9 @@ class ViewRenderer
 
 		$components = $this->components->getComponents();
 
+		//var_dump($components);
+		//die();
+
 		$customTags = array_keys($components);
 		$nodes = $parser->getNodeTuple($customTags);
 

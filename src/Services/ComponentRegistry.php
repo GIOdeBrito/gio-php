@@ -28,6 +28,20 @@ class ComponentRegistry
 		$this->registeredComponents[$tagName] = $callback;
 	}
 
+	public function register2 (array $component)
+	{
+		// Checks if the tag already exists or if the function is callable
+		if(array_key_exists($component['selector'], $this->registeredComponents))
+        {
+			return;
+        }
+
+		$tagName = $component['selector'];
+		$callback = $component['template'];
+
+		$this->registeredComponents[$tagName] = $callback;
+	}
+
 	public function getComponents (): array
 	{
 		return $this->registeredComponents;

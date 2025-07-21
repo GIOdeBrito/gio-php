@@ -30,7 +30,9 @@ $app->router()->set404('/public/404');
 
 $app->components()->useComponents(true);
 
-require constant('ABSPATH').'/Components/button-icon.php';
+$app->components()->register2(include constant('ABSPATH').'/Components/button-icon-2.php');
+
+//require constant('ABSPATH').'/Components/button-icon.php';
 
 $app->run();
 
