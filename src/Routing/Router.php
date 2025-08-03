@@ -4,7 +4,7 @@ namespace GioPHP\Routing;
 
 use GioPHP\Http\{Request, Response};
 use GioPHP\Services\{Loader, Logger, ComponentRegistry};
-use GioPHP\Abraxas\Db;
+use GioPHP\Database\Db;
 
 class Router
 {
@@ -137,7 +137,7 @@ class Router
 
 		// Available parameters for the controller's constructor
 		$possibleParameters = [
-			'db' 			=> $this->db,
+			'database' 		=> $this->db,
 			'logger' 		=> $this->logger,
 			'components' 	=> $this->components
 		];

@@ -22,7 +22,7 @@ class ViewRenderer
 	public function beginCapture (): void
 	{
 		ob_start();
-		echo '<div data-name="gphpview-root"></div>';
+		echo '<div></div>';
 	}
 
 	public function endCapture (): void
@@ -46,14 +46,10 @@ class ViewRenderer
 
 		$components = $this->components->getComponents();
 
-		//var_dump($components);
-		//die();
-
 		$customTags = array_keys($components);
 		$nodes = $parser->getNodeTuple($customTags);
 
-		//$tags = $parser?->getTagNames();
-
+		// Iterate over the found custom nodes
 		foreach($nodes as $node)
 		{
 			$tagName = trim($node->localName);
@@ -63,19 +59,19 @@ class ViewRenderer
 				continue;
 			}
 
+			// Get the component class
+			$component = $components[$tagName];
+
 			// Store the component's content into the buffer
-			$element = $this->createElement($node, $components[$tagName]);
+			$element = $this->createElement($node, $component);
 
 			$parser->replaceNode($node, $element);
 		}
 
-		//echo htmlspecialchars($parser->domToHTML());
-		//echo $parser->domToHTML();
-
 		$this->htmlContent = $parser->domToHTML();
 	}
 
-	public function createElement ($node, $componentCallback)
+	public function createElement ($node, $componentClass)
 	{
 		$attr = DOMParser::getNodeAttributes($node, 'g:');
 
@@ -90,13 +86,13 @@ class ViewRenderer
 		$value = DOMParser::getNodeInnerText($node);
 		$custom = $attr->custom ?? [];
 
-		// Create element in a limited context
-		return (function() use ($componentCallback, $value, $custom, $attributes)
+		// Create element in an isolated context
+		return (function() use ($componentClass, $value, $custom, $attributes)
 		{
 			$args = [ 'value' => $value, ...$custom, 'attributes' => $attributes ];
 
 			ob_start();
-			call_user_func_array($componentCallback, $args);
+			call_user_func([$componentClass, 'render'], $args);
 			return ob_get_clean();
 		})();
 	}

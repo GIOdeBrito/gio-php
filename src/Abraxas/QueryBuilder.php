@@ -2,7 +2,7 @@
 
 namespace GioPHP\Abraxas;
 
-use GioPHP\Abraxas\Db;
+use GioPHP\Database\Db;
 
 abstract class QueryBuilder
 {

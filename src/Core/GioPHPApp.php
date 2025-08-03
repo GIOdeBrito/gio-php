@@ -4,7 +4,7 @@ namespace GioPHP\Core;
 
 use GioPHP\Routing\Router;
 use GioPHP\Services\{Loader, Logger, ComponentRegistry};
-use GioPHP\Abraxas\Db;
+use GioPHP\Database\Db;
 
 define("GIOPHP_SRC_ROOT_PATH", __DIR__.'/..');
 
@@ -20,8 +20,8 @@ class GioPHPApp
 	{
 		$this->logger = new Logger();
 		$this->loader = new Loader();
-		$this->components = new ComponentRegistry();
 
+		$this->components = new ComponentRegistry($this->logger);
 		$this->db = new Db($this->loader, $this->logger);
 		$this->router = new Router($this->loader, $this->logger, $this->db, $this->components);
 	}
@@ -56,7 +56,6 @@ class GioPHPApp
 		catch(\Exception $ex)
 		{
 			$this->logger->error($ex->getMessage());
-			echo "There was an error.";
 			die();
 		}
 	}

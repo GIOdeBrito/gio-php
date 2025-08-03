@@ -43,16 +43,6 @@ class DOMParser
 	public function domNodeInnerHtml (object $node): string
 	{
 		return implode(' ', array_map(fn($child) => $this->domNodeOuterHtml($child), iterator_to_array($node->firstChild->childNodes)));
-
-		/*return;
-		$html = [];
-
-		foreach($node->childNodes as $child)
-		{
-			array_push($html, $this->domNodeOuterHtml($child));
-		}
-
-		return implode(' ', $html);*/
 	}
 
 	public function getNodeTuple (array $tags = []): array

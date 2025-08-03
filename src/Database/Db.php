@@ -1,6 +1,6 @@
 <?php
 
-namespace GioPHP\Abraxas;
+namespace GioPHP\Database;
 
 use GioPHP\Services\Loader;
 use GioPHP\Services\Logger;

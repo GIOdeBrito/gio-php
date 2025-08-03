@@ -3,28 +3,16 @@
 require __DIR__.'/../Models/Users.php';
 
 use GioPHP\MVC\Controller;
-use GioPHP\Abraxas\Db;
 
 //include constant('ABSPATH').'/Components/button-icon.php';
 
 class Home extends Controller
 {
-	private $db = NULL;
-
-	public function __construct ($db, $components)
-	{
-		$this->db = $db;
-
-
-	}
-
 	public function index ($req, $res): void
 	{
 		$viewData = [
 			'title' => 'Home'
 		];
-
-		//var_dump($this->db);
 
 		$res->setStatus(200);
 		$res->render('Home', $viewData);
@@ -42,22 +30,12 @@ class Home extends Controller
 			'title' => 'Db'
 		];
 
-		Db::open();
-		Db::exec("INSERT INTO USERS VALUES (:idd, :name, :num)", [ 'idd' => 2, 'name' => 'BRUNO', 'num' => 123 ]);
-		Db::commit();
-		Db::close();
+		$db = $this->getDatabase();
+		$db->open();
+		//$db->exec("INSERT INTO USERS VALUES (:idd, :name, :num)", [ 'idd' => 2, 'name' => 'BRUNO', 'num' => 123 ]);
+		$res = $db->query("SELECT * FROM USERS");
 
-		$user = new USERS();
-
-		$items = $user->all()->toObject();
-
-		foreach($items as $item)
-		{
-			echo $item->ID.PHP_EOL;
-			echo $item->UNAME.PHP_EOL;
-			echo $item->UPWD.PHP_EOL;
-		}
-
+		var_dump($res);
 		die();
 
 		$res->setStatus(200);

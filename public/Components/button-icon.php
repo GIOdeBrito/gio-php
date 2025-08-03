@@ -1,15 +1,11 @@
 <?php
 
-function ButtonIcon ($value = '', $icon = '', $attributes = '')
-{
-	?>
-	<button <?= $attributes ?>>
-		<img src="<?= $icon ?>" alt="<?= $icon ?? '' ?>">
-		<?= $value ?>
-	</button>
-	<?php
-}
+use GioPHP\DOM\Component;
 
-$app->components()->register('button-icon', 'ButtonIcon');
+return new Component(
+	tag: 'button-icon',
+	template: __DIR__.'/template.php',
+	params: ['id', 'value', 'data-id']
+);
 
 ?>

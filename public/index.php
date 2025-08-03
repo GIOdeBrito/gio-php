@@ -13,7 +13,6 @@ $app = new App();
 # // TODO: Switch from named functions to a generic set. Ex: ->set('views', path)
 
 $app->loader()->views = __DIR__."/Views";
-//$app->loader()->layout = __DIR__."/Template/_layout.php";
 $app->loader()->connectionString = "sqlite:".__DIR__.'/database.db';
 
 $app->router()->get('/public/', [Home::class, 'index']);
@@ -29,8 +28,7 @@ $app->router()->get('/public/param/:name', function($req)
 $app->router()->set404('/public/404');
 
 $app->components()->useComponents(true);
-
-$app->components()->register2(include constant('ABSPATH').'/Components/button-icon-2.php');
+$app->components()->import(include constant('ABSPATH').'/Components/button-icon.php');
 
 //require constant('ABSPATH').'/Components/button-icon.php';
 

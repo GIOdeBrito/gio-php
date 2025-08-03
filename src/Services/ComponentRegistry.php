@@ -2,10 +2,18 @@
 
 namespace GioPHP\Services;
 
+use GioPHP\Services\Logger;
+
 class ComponentRegistry
 {
 	private bool $useComponents = false;
 	private array $registeredComponents = [];
+	private ?Logger $logger = NULL;
+
+	public function __construct (Logger $logger)
+	{
+		$this->logger = $logger;
+	}
 
 	public function useComponents ($value): void
 	{
@@ -17,7 +25,7 @@ class ComponentRegistry
 		return $this->useComponents;
 	}
 
-	public function register (string $tagName, string|array|object $callback)
+	/*public function register (string $tagName, string|array|object $callback): void
 	{
 		// Checks if the tag already exists or if the function is callable
 		if(array_key_exists($tagName, $this->registeredComponents) || !is_callable($callback))
@@ -26,20 +34,13 @@ class ComponentRegistry
         }
 
 		$this->registeredComponents[$tagName] = $callback;
-	}
+	}*/
 
-	public function register2 (array $component)
+	public function import (object $component): void
 	{
-		// Checks if the tag already exists or if the function is callable
-		if(array_key_exists($component['selector'], $this->registeredComponents))
-        {
-			return;
-        }
+		$tagName = $component?->getTagName() ?? NULL;
 
-		$tagName = $component['selector'];
-		$callback = $component['template'];
-
-		$this->registeredComponents[$tagName] = $callback;
+		$this->registeredComponents[$tagName] = $component;
 	}
 
 	public function getComponents (): array
