@@ -75,26 +75,22 @@ class ViewRenderer
 	{
 		$attr = DOMParser::getNodeAttributes($node, 'g:');
 
-		$attrKvp = [];
+		$attributes = [];
 
-		array_walk($attr->attribute, function ($value, $key) use (&$attrKvp)
+		array_walk($attr->attribute, function ($value, $key) use (&$attributes)
 		{
-			array_push($attrKvp, "{$key}=\"{$value}\"");
+			$attributes[$key] = $value;
 		});
 
-		$attributes = implode(' ', $attrKvp);
 		$value = DOMParser::getNodeInnerText($node);
 		$custom = $attr->custom ?? [];
 
-		// Create element in an isolated context
-		return (function() use ($componentClass, $value, $custom, $attributes)
-		{
-			$args = [ 'value' => $value, ...$custom, 'attributes' => $attributes ];
+		// The arguments for the component's method
+		$args = [ 'value' => $value, ...$custom, ...$attributes ];
 
-			ob_start();
-			call_user_func([$componentClass, 'render'], $args);
-			return ob_get_clean();
-		})();
+		ob_start();
+		call_user_func([$componentClass, 'render'], $args);
+		return ob_get_clean();
 	}
 
 	public function getHtml (): string

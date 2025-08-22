@@ -3,7 +3,7 @@
 // Template for ButtonIcon
 
 ?>
-<button <?= $attributes ?>>
+<button <?= $id ?> <?= $attributes ?>>
 	<img src="<?= $icon ?>" alt="<?= $icon ?? '' ?>">
 	<?= $value ?>
 </button>
