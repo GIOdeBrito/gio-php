@@ -26,9 +26,9 @@ class Db
 
 	public function open (): bool
 	{
-		$connection = $this->loader->connectionString;
-		$login = $this->loader->dbLogin;
-		$pwd = $this->loader->dbPwd;
+		$connection = $this->loader->getConnectionString();
+		$login = $this->loader->getDatabaseLogin();
+		$pwd = $this->loader->getDatabaseSecret();
 
 		try
 		{

@@ -5,7 +5,7 @@ namespace GioPHP\Services;
 class Loader
 {
 	private string $views = "";
-	private string $layout;
+	private string $layout = "";
 
 	private string $connectionString;
 	private ?string $dbLogin;
@@ -13,46 +13,51 @@ class Loader
 
 	public function __construct ()
 	{
-		$this->layout = constant("GIOPHP_SRC_ROOT_PATH")."/Template/_layout.php";
+		$this->layout = constant("GIOPHP_SRC_ROOT_PATH")."/Template/";
 
 		$this->connectionString = "";
 		$this->dbLogin = NULL;
 		$this->dbPwd = NULL;
 	}
 
-	public function __set (string $key, mixed $param): void
-	{
-		if(!method_exists($this, $key))
-		{
-			return;
-		}
-
-		$this->{$key}($param);
-	}
-
-	public function __get (string $key): mixed
-	{
-		if(!property_exists($this, $key))
-		{
-			return NULL;
-		}
-
-		return $this->$key;
-	}
-
-	private function views (string $path): void
+	public function setViewDirectory (string $path): void
 	{
 		$this->views = $path;
 	}
 
-	private function layout (string $path): void
+	public function setLayoutDirectory (string $path): void
 	{
-		$this->layout = $view.'/'.$path;
+		$this->layout = $path;
 	}
 
-	private function connectionString (string $connection): void
+	public function setConnectionString (string $connection): void
 	{
 		$this->connectionString = $connection;
+	}
+
+	public function getViewDirectory (): string
+	{
+		return $this->views;
+	}
+
+	public function getLayoutDirectory (): string
+	{
+		return $this->layout;
+	}
+
+	public function getConnectionString (): string
+	{
+		return $this->connectionString;
+	}
+
+	public function getDatabaseLogin (): string
+	{
+		return $this->dbLogin ?? '';
+	}
+
+	public function getDatabaseSecret (): string
+	{
+		return $this->dbPwd ?? '';
 	}
 }
 

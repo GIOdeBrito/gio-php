@@ -4,8 +4,6 @@ require __DIR__.'/../Models/Users.php';
 
 use GioPHP\MVC\Controller;
 
-//include constant('ABSPATH').'/Components/button-icon.php';
-
 class Home extends Controller
 {
 	public function index ($req, $res): void
@@ -15,7 +13,7 @@ class Home extends Controller
 		];
 
 		$res->setStatus(200);
-		$res->render('Home', $viewData);
+		$res->render('Home', '_layout', $viewData);
 	}
 
 	public static function staticTeste ($req, $res): void
@@ -39,7 +37,7 @@ class Home extends Controller
 		die();
 
 		$res->setStatus(200);
-		$res->render('Home', $viewData);
+		$res->render('Home', '_layout', $viewData);
 	}
 
 	public function notFound ($req, $res)
