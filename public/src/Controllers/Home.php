@@ -1,6 +1,6 @@
 <?php
 
-require __DIR__.'/../Models/Users.php';
+require constant('ABSPATH').'/src/Models/Users.php';
 
 use GioPHP\MVC\Controller;
 

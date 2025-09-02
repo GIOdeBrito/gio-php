@@ -3,14 +3,14 @@
 // Make sure to run this file from the command prompt
 if(php_sapi_name() !== 'cli')
 {
-	echo "Halted. Run this installer from the command prompt.".PHP_EOL;
+	echo "Halted. Run this file from the command prompt.".PHP_EOL;
 	die();
 }
 
 echo "GioPHP Installer.".PHP_EOL;
 
 // Alter the version for the one to installer will fetch
-$VERSION = "1.0.2";
+$VERSION = "1.0.3";
 
 echo "Fetching GioPHP standalone version: {$VERSION}.".PHP_EOL;
 
@@ -24,7 +24,7 @@ if(!file_put_contents("gio-php-v{$VERSION}.tar.gz", file_get_contents($url)))
 	die();
 }
 
-echo "Downloaded standalone file from Github repository.".PHP_EOL;
+echo "Downloaded standalone file from GitHub repository.".PHP_EOL;
 
 try
 {
@@ -60,6 +60,6 @@ catch(Exception $ex)
 
 echo "Finished installation.".PHP_EOL;
 
-echo "Hello, there. Thank you for using GioPHP. Hope you also leave some feedback :D".PHP_EOL;
+echo "Thank you for using GioPHP. Hope you also leave some feedback :D".PHP_EOL;
 
 ?>

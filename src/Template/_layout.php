@@ -10,10 +10,10 @@
 		<meta name="author" content="GIOdeBrito">
 		<meta name="description" content="GioPHP default layout">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title><?= $title; ?> — Public</title>
+		<title><?= $title ?></title>
 	</head>
 
 	<body>
-		<?= $body; ?>
+		<?= $body ?>
 	</body>
 </html>

@@ -2,7 +2,7 @@
 
 namespace GioPHP\Http;
 
-use GioPHP\Enums\{ResponseTypes, ContentTypes};
+use GioPHP\Enums\{ResponseTypes, ContentType};
 use GioPHP\Services\{Loader, Logger, ComponentRegistry};
 use GioPHP\Http\ResponsePayload;
 use GioPHP\View\ViewRenderer;
@@ -28,7 +28,7 @@ class Response
 		$this->payload = new ResponsePayload();
 	}
 
-	private function setPayload (mixed $body, ResponseTypes $response, ContentTypes $content, int $status = 200)
+	private function setPayload (mixed $body, ResponseTypes $response, string $content, int $status = 200)
 	{
 		$this->payload->body = $body;
 		$this->payload->contentType = $content;
@@ -42,7 +42,7 @@ class Response
 		$this->layout = $layout;
 		$this->viewparams = $params;
 
-		$this->setPayload('', ResponseTypes::VIEW, ContentTypes::HTML);
+		$this->setPayload('', ResponseTypes::VIEW, ContentType::Html);
 		$this->send();
 	}
 
@@ -53,45 +53,45 @@ class Response
 
 	public function html (string $body): void
 	{
-		$this->setPayload($body, ResponseTypes::HTML, ContentTypes::HTML);
+		$this->setPayload($body, ResponseTypes::HTML, ContentType::Html);
 		$this->send();
 	}
 
 	public function json (array|object $data): void
 	{
-		$this->setPayload($data, ResponseTypes::JSON, ContentTypes::JSON);
+		$this->setPayload($data, ResponseTypes::JSON, ContentType::Json);
 		$this->send();
 	}
 
 	public function plain (string $body): void
 	{
-		$this->setPayload($body, ResponseTypes::PLAINTEXT, ContentTypes::PLAIN);
+		$this->setPayload($body, ResponseTypes::PLAINTEXT, ContentType::PlainText);
 		$this->send();
 	}
 
-	public function file (string $path): void
+	public function file (string $path, string $type = ContentType::FileStream): void
 	{
-		$this->setPayload($path, ResponseTypes::FILE, ContentTypes::FILE);
+		$this->setPayload($path, ResponseTypes::FILE, $type);
 		$this->send();
 	}
 
 	public function end (): void
 	{
-		$this->setPayload('', ResponseTypes::PLAINTEXT, ContentTypes::PLAIN);
+		$this->setPayload('', ResponseTypes::PLAINTEXT, ContentType::PlainText);
 		$this->send();
 	}
 
 	public function redirect (string $url): void
 	{
 		http_response_code(301);
-		header("Location: ${url}");
+		header("Location: {$url}");
 		die();
 	}
 
 	private function send (): void
 	{
 		http_response_code(intval($this->payload->status));
-		header('Content-Type: '.$this->payload->contentType->value);
+		header('Content-Type: '.$this->payload->contentType);
 
 		try
 		{
@@ -113,10 +113,10 @@ class Response
 					$this->sendPlain();
 					break;
 				default:
-					throw new \LogicException("Unkown response '{$this->payload->responseType}'.");
+					throw new \LogicException("Unknown response '{$this->payload->responseType}'.");
 			}
 		}
-		catch (\Exception $ex)
+		catch(\Exception $ex)
 		{
 			$this->logger?->error($ex?->getMessage());
 			http_response_code(500);
@@ -156,6 +156,7 @@ class Response
 
 		$body = $viewrenderer->getHtml();
 
+		// Extract params as proper variables
 		extract($this->viewparams);
 
 		// Load layout

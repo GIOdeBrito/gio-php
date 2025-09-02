@@ -2,12 +2,12 @@
 
 namespace GioPHP\Http;
 
-use GioPHP\Enums\{ResponseTypes, ContentTypes};
+use GioPHP\Enums\ResponseTypes;
 
 class ResponsePayload
 {
 	private int $status = 200;
-	private ContentTypes $contenttype;
+	private string $contenttype;
 	private ResponseTypes $responsetype;
 	private mixed $body = NULL;
 
@@ -45,7 +45,7 @@ class ResponsePayload
 		return $this->body;
 	}
 
-	private function getContentType (): ContentTypes
+	private function getContentType (): string
 	{
 		return $this->contenttype;
 	}
@@ -65,7 +65,7 @@ class ResponsePayload
 		$this->body = $value;
 	}
 
-	private function setContentType (ContentTypes $type): void
+	private function setContentType (string $type): void
 	{
 		$this->contenttype = $type;
 	}
