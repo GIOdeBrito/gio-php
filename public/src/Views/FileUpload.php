@@ -3,7 +3,7 @@
 <p>Upload and send multiple files here.</p>
 
 <form method="POST" action="/public/fileschema" enctype="multipart/form-data">
-	<input type="file" multiple name="annex[]">
+	<input type="file" multiple name="annex">
 	<input type="submit" value="Send">
 </form>
 

@@ -86,13 +86,13 @@ class Home extends Controller
 		method: 'POST',
 		path: '/public/fileschema',
 		description: 'Schema file upload endpoint.',
-		schema: [ 'annex' => 'file:file' ]
+		schema: [ 'annex' => 'file:jpg' ]
 	)]
 	public function schemaFile ($req, $res): void
 	{
 		$files = $req->files->annex;
 
-		foreach ($files as $item)
+		foreach($files as $item)
 		{
 			?>
 			<p>Name: <?= $item->name() ?></p>

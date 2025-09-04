@@ -151,8 +151,13 @@ class Request
 
 		$filedata = $_FILES[$key];
 
+		if(!isset($filedata['name']))
+		{
+			return false;
+		}
+
 		// Checks if multiple files are being sent at once
-		$isMultiForm = count($filedata['name']) > 0 ? true : false;
+		$isMultiForm = is_array($filedata['name']) ? true : false;
 
 		if(!$isMultiForm)
 		{
