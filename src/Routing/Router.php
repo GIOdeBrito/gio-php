@@ -88,7 +88,7 @@ class Router
 			$res->redirect("/");
 		}
 
-		$requestPath = $req->uri;
+		$requestPath = $req->path;
 
 		if(!array_key_exists($requestPath, $this->routes[$requestMethod]))
 		{
@@ -96,6 +96,8 @@ class Router
 		}
 
 		$route = $this->routes[$requestMethod][$requestPath];
+
+		$req->getSchema($route->schema);
 
 		$controller = $this->controllerInstantiator($route->getController());
 		$controller->{$route->getControllerMethod()}($req, $res);

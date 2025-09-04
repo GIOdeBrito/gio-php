@@ -4,13 +4,17 @@ namespace GioPHP\Http;
 
 use GioPHP\Services\Logger;
 
+require __DIR__.'/../Helpers/Types.php';
+
+use function GioPHP\Helpers\convertToType;
+
 class Request
 {
 	private string $method = "";
-	private string $uri = "";
+	private string $path = "";
 	private ?object $params = NULL;
-	private ?object $form = NULL;
-	private ?object $body = NULL;
+	private array $form = [];
+	private array $body = [];
 	private ?object $files = NULL;
 
 	private Logger $logger;
@@ -18,7 +22,7 @@ class Request
 	public function __construct (Logger $logger)
 	{
 		$this->method = strtoupper($_SERVER["REQUEST_METHOD"]);
-		$this->uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+		$this->path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
 		$this->logger = $logger;
 	}
@@ -40,9 +44,9 @@ class Request
 		return strtoupper($this->method);
 	}
 
-	private function uri (): string
+	private function path (): string
 	{
-		return $this->uri;
+		return $this->path;
 	}
 
 	private function params (): object
@@ -52,12 +56,12 @@ class Request
 
 	private function form (): object
 	{
-		return $this->form;
+		return (object) ($this->form ?? []);
 	}
 
 	private function body (): object
 	{
-		return $this->body;
+		return (object) $this->body;
 	}
 
 	private function file (): object
@@ -68,7 +72,7 @@ class Request
 	private function getPosted (): void
 	{
 		// Gets formdata
-		$this->form = (object) (json_decode($_POST['body'] ?? '', true));
+		$this->form = (object) (json_decode($_POST ?? '', true));
 
 		// Gets JSON
 		$this->body = (object) (json_decode(file_get_contents('php://input') ?? '', true));
@@ -77,10 +81,57 @@ class Request
 		$this->files = (object) ($_FILES ?? []);
 	}
 
-	public function getHttpParams (array $params = [])
+	public function getSchema (array $schema = []): void
 	{
-		var_dump($params);
-		die();
+		foreach($schema as $key => $value):
+
+			$name = $key;
+			$entry = mb_strtolower(explode(':', $value)[0], 'UTF-8');
+			$type = mb_strtolower(explode(':', $value)[1], 'UTF-8');
+
+			switch($entry)
+			{
+				case 'form':
+					$this->getFormParam($key, $type);
+					break;
+
+				case 'json':
+					$this->getJsonParam($key, $type);
+					break;
+
+				default:
+					break;
+			}
+
+		endforeach;
+	}
+
+	private function getFormParam (string $key, string $type): bool
+	{
+		if(!isset($_POST[$key]))
+		{
+			return false;
+		}
+
+		$value = convertToType($_POST[$key], $type);
+		$this->form[$key] = $value;
+
+		return true;
+	}
+
+	private function getJsonParam (string $key, string $type): bool
+	{
+		$json = json_decode(file_get_contents('php://input') ?? '', true);
+
+		if(!isset($json[$key]))
+		{
+			return false;
+		}
+
+		$value = convertToType($json[$key], $type);
+		$this->body[$key] = $value;
+
+		return true;
 	}
 }
 

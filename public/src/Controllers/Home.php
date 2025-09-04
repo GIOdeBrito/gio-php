@@ -46,6 +46,22 @@ class Home extends Controller
 	}
 
 	#[Route(
+		method: 'POST',
+		path: '/public/schema',
+		description: 'Schema test page.',
+		schema: [ 'id' => 'json:int', 'name' => 'json:string' ]
+	)]
+	public function schema ($req, $res): void
+	{
+
+
+		//$res->setStatus(200);
+		var_dump($req->body);
+		die();
+		$res->end();
+	}
+
+	#[Route(
 		method: 'GET',
 		path: '/public/error',
 		description: 'Default error page.',
