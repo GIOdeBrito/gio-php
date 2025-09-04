@@ -53,12 +53,8 @@ class Home extends Controller
 	)]
 	public function schema ($req, $res): void
 	{
-
-
-		//$res->setStatus(200);
 		var_dump($req->body);
-		die();
-		$res->end();
+		$res->end(200);
 	}
 
 	#[Route(

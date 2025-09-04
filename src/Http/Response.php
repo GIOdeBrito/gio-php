@@ -75,10 +75,10 @@ class Response
 		$this->send();
 	}
 
-	public function end (): void
+	public function end (int $status = 200): void
 	{
-		$this->setPayload('', ResponseTypes::PLAINTEXT, ContentType::PlainText);
-		$this->send();
+		http_response_code($status);
+		die();
 	}
 
 	public function redirect (string $url): void
