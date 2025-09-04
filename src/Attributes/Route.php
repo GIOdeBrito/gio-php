@@ -1,6 +1,6 @@
 <?php
 
-namespace GioPHP\Routing;
+namespace GioPHP\Attributes;
 
 use Attribute;
 

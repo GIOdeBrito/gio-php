@@ -3,7 +3,7 @@
 use GioPHP\MVC\Controller;
 use GioPHP\Enums\ContentType;
 
-use GioPHP\Routing\Route;
+use GioPHP\Attributes\Route;
 
 class FileController extends Controller
 {

@@ -2,28 +2,28 @@
 
 namespace GioPHP\Http;
 
-use GioPHP\Services\Logger;
-
 require __DIR__.'/../Helpers/Types.php';
 
+use GioPHP\Services\Logger;
+use GioPHP\Http\FileData;
 use function GioPHP\Helpers\convertToType;
 
 class Request
 {
 	private string $method = "";
 	private string $path = "";
-	private ?object $params = NULL;
+
 	private array $form = [];
 	private array $body = [];
-	private ?object $files = NULL;
+	private array $query = [];
+	private array $files = [];
 
 	private Logger $logger;
 
 	public function __construct (Logger $logger)
 	{
-		$this->method = strtoupper($_SERVER["REQUEST_METHOD"]);
+		$this->method = mb_strtoupper($_SERVER["REQUEST_METHOD"]);
 		$this->path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-
 		$this->logger = $logger;
 	}
 
@@ -31,8 +31,7 @@ class Request
 	{
 		if(!property_exists($this, $name))
 		{
-			//throw new Exception("Property {$name} does not have a getter function or does not exist");
-			$this->logger->error("Property {$name} does not have a getter function or does not exist.");
+			$this->logger->error("Property '{$name}' does not have a getter function or does not exist.");
 			return NULL;
 		}
 
@@ -49,14 +48,9 @@ class Request
 		return $this->path;
 	}
 
-	private function params (): object
-	{
-		return $this->params;
-	}
-
 	private function form (): object
 	{
-		return (object) ($this->form ?? []);
+		return (object) $this->form;
 	}
 
 	private function body (): object
@@ -64,21 +58,14 @@ class Request
 		return (object) $this->body;
 	}
 
-	private function file (): object
+	private function query (): object
 	{
-		return $this->files;
+		return (object) $this->query;
 	}
 
-	private function getPosted (): void
+	private function files (): object
 	{
-		// Gets formdata
-		$this->form = (object) (json_decode($_POST ?? '', true));
-
-		// Gets JSON
-		$this->body = (object) (json_decode(file_get_contents('php://input') ?? '', true));
-
-		// Gets files via formdata
-		$this->files = (object) ($_FILES ?? []);
+		return (object) $this->files;
 	}
 
 	public function getSchema (array $schema = []): void
@@ -97,6 +84,14 @@ class Request
 
 				case 'json':
 					$this->getJsonParam($key, $type);
+					break;
+
+				case 'query':
+					$this->getQueryParam($key, $type);
+					break;
+
+				case 'file':
+					$this->getFileParam($key, $type);
 					break;
 
 				default:
@@ -130,6 +125,75 @@ class Request
 
 		$value = convertToType($json[$key], $type);
 		$this->body[$key] = $value;
+
+		return true;
+	}
+
+	private function getQueryParam (string $key, string $type): bool
+	{
+		if(!isset($_GET[$key]))
+		{
+			return false;
+		}
+
+		$value = convertToType($_GET[$key], $type);
+		$this->query[$key] = $value;
+
+		return true;
+	}
+
+	private function getFileParam (string $key, string $type): bool
+	{
+		if(!isset($_FILES[$key]))
+		{
+			return false;
+		}
+
+		$filedata = $_FILES[$key];
+
+		// Checks if multiple files are being sent at once
+		$isMultiForm = count($filedata['name']) > 0 ? true : false;
+
+		if(!$isMultiForm)
+		{
+			$name = $filedata['name'];
+			$fullpath = $filedata['full_path'];
+			$type = $filedata['type'];
+			$tempname = $filedata['tmp_name'];
+			$error = $filedata['error'];
+			$size = $filedata['size'];
+
+			$this->files[$key] = new FileData(
+				$name,
+				$fullpath,
+				$type,
+				$tempname,
+				$error,
+				$size
+			);
+
+			return true;
+		}
+
+		for($i = 0; $i < count($filedata['name']); $i++):
+
+			$name = $filedata['name'][$i];
+			$fullpath = $filedata['full_path'][$i];
+			$type = $filedata['type'][$i];
+			$tempname = $filedata['tmp_name'][$i];
+			$error = $filedata['error'][$i];
+			$size = $filedata['size'][$i];
+
+			$this->files[$key][$i] = new FileData(
+				$name,
+				$fullpath,
+				$type,
+				$tempname,
+				$error,
+				$size
+			);
+
+		endfor;
 
 		return true;
 	}
