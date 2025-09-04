@@ -3,9 +3,16 @@
 use GioPHP\MVC\Controller;
 use GioPHP\Enums\ContentType;
 
+use GioPHP\Routing\Route;
+
 class FileController extends Controller
 {
-	public static function fileDownload ($req, $res): void
+	#[Route(
+		method: 'GET',
+		path: '/public/download',
+		description: 'File download test.'
+	)]
+	public function fileDownload ($req, $res): void
 	{
 		$path = constant('ABSPATH').'/assets/hipopotamo.jpg';
 
@@ -18,7 +25,12 @@ class FileController extends Controller
 		$res->file($path);
 	}
 
-	public static function fileDisplay ($req, $res): void
+	#[Route(
+		method: 'GET',
+		path: '/public/image',
+		description: 'Image display test.'
+	)]
+	public function fileDisplay ($req, $res): void
 	{
 		$path = constant('ABSPATH').'/assets/hipopotamo.jpg';
 
@@ -31,7 +43,12 @@ class FileController extends Controller
 		$res->file($path, ContentType::ImageJpg);
 	}
 
-	public static function fileBase64 ($req, $res): void
+	#[Route(
+		method: 'GET',
+		path: '/public/image64',
+		description: 'Outputs image as base64.'
+	)]
+	public function fileBase64 ($req, $res): void
 	{
 		$path = constant('ABSPATH').'/assets/hipopotamo.jpg';
 

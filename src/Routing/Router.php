@@ -5,10 +5,13 @@ namespace GioPHP\Routing;
 use GioPHP\Http\{Request, Response};
 use GioPHP\Services\{Loader, Logger, ComponentRegistry};
 use GioPHP\Database\Db;
+use GioPHP\Routing\ControllerRoute;
 
 class Router
 {
-	private ?array $routes = NULL;
+	private array $routes = [];
+	private array $controllers = [];
+
 	private string $notFoundPage = "";
 
 	private Loader $loader;
@@ -25,37 +28,52 @@ class Router
 			'DELETE' 	=> []
 		];
 
-		$this->notFoundPage = "/404";
-
 		$this->loader = $loader;
 		$this->logger = $logger;
 		$this->db = $db;
 		$this->components = $components;
 	}
 
-	public function get (string $route, object|string|array $callback): void
+	public function addController (string $controller): void
 	{
-		$this->addRoute('GET', $route, $callback);
-	}
+		$reflect = new \ReflectionClass($controller);
 
-	public function post (string $route, object|string|array $callback): void
-	{
-		$this->addRoute('POST', $route, $callback);
-	}
+		foreach($reflect->getMethods() as $method):
 
-	public function put (string $route, object|string|array $callback): void
-	{
-		$this->addRoute('PUT', $route, $callback);
-	}
+			$routeAttributes = $method->getAttributes();
 
-	public function delete (string $route, object|string|array $callback): void
-	{
-		$this->addRoute('DELETE', $route, $callback);
-	}
+			// Skip iteration if no attribute was found
+			if(empty($routeAttributes))
+			{
+				continue;
+			}
 
-	public function set404 ($address): void
-	{
-		$this->notFoundPage = $address;
+			foreach($routeAttributes as $attribute):
+
+				$route = $attribute->newInstance();
+
+				if(!$this->methodExists($route->method))
+				{
+					continue;
+				}
+
+				$controllerRoute = new ControllerRoute();
+				$controllerRoute->method = $route->method;
+				$controllerRoute->path = $route->path;
+				$controllerRoute->description = $route->description;
+				$controllerRoute->schema = $route->schema;
+				$controllerRoute->controller = [$controller, $method->getName()];
+
+				if($route->isError)
+				{
+					$this->notFoundPage = $controllerRoute->path;
+				}
+
+				$this->routes[$route->method][$route->path] = $controllerRoute;
+
+			endforeach;
+
+		endforeach;
 	}
 
 	public function call (): void
@@ -63,60 +81,35 @@ class Router
 		$req = new Request($this->logger);
 		$res = new Response($this->loader, $this->logger, $this->components);
 
-		// Checks if the request method does exist in the router
-		if(!array_key_exists($req->method, $this->routes))
+		$requestMethod = $req->method;
+
+		if(!$this->methodExists($requestMethod))
 		{
 			$res->redirect("/");
 		}
 
-		$route = NULL;
+		$requestPath = $req->uri;
 
-		// Looks for the registered route
-		foreach($this->routes[$req->method] as $key => $value)
+		if(!array_key_exists($requestPath, $this->routes[$requestMethod]))
 		{
-			if(!$req->parseRoute($key, $req->uri))
-			{
-				continue;
-			}
-
-			$route = $key;
-		}
-
-		// If route does not exists, redirects user to the 404 page
-		if(is_null($route))
-		{
-			$this->logger->warning("Route: '{$req->uri}' was not found.");
 			$res->redirect($this->notFoundPage);
 		}
 
-		$this->logger->info("Route: '{$req->uri}' was found! :D");
+		$route = $this->routes[$requestMethod][$requestPath];
 
-		// Callback function
-		$func = $this->routes[$req->method][$route];
-
-		// For controllers
-		if(is_array($func))
-		{
-			$controller = $this->controllerInstantiator($func[0]);
-			$method = $func[1];
-
-			$controller->{$method}($req, $res);
-			return;
-		}
-
-		// For functions
-		call_user_func($func, $req, $res);
+		$controller = $this->controllerInstantiator($route->getController());
+		$controller->{$route->getControllerMethod()}($req, $res);
 	}
 
-	private function addRoute (string $method, string $route, object|string|array $callback): void
+	// Checks whether a method exists in this router
+	private function methodExists (string $method): bool
 	{
-		if(!array_key_exists($method, $this->routes))
+		if(array_key_exists($method, $this->routes))
 		{
-			$this->logger->error("Could not add route {$route}: method '{$method}' does not exist.");
-			return;
+			return true;
 		}
 
-		$this->routes[$method][$route] = $callback;
+		return false;
 	}
 
 	private function controllerInstantiator (string $className): object
@@ -139,7 +132,6 @@ class Router
 		$controllerParams = [];
 
 		foreach($constructor->getParameters() as $param):
-
 			$paramName = $param->getName();
 
 			if(!array_key_exists($paramName, $possibleParameters))
@@ -148,7 +140,6 @@ class Router
 			}
 
 			$controllerParams[$paramName] = $possibleParameters[$paramName];
-
 		endforeach;
 
 		return new $className(...$controllerParams);

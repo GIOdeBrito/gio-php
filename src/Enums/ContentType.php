@@ -11,6 +11,7 @@ class ContentType
 	public const ImageJpeg = "image/jpeg";
 	public const ImageJpg = "image/jpg";
 	public const ImagePng = "image/png";
+	public const ImageWebp = "image/webp";
 }
 
 ?>

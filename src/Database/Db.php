@@ -5,8 +5,6 @@ namespace GioPHP\Database;
 use GioPHP\Services\Loader;
 use GioPHP\Services\Logger;
 
-/* Database singleton */
-
 class Db
 {
 	private ?\PDO $pdo = NULL;

@@ -21,7 +21,6 @@ class Request
 		$this->uri = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 
 		$this->logger = $logger;
-		$this->getPosted();
 	}
 
 	public function __get (string $name): mixed
@@ -75,37 +74,13 @@ class Request
 		$this->body = (object) (json_decode(file_get_contents('php://input') ?? '', true));
 
 		// Gets files via formdata
-		$this->files = (object) ($_FILES['uploadedfiles'] ?? []);
+		$this->files = (object) ($_FILES ?? []);
 	}
 
-	// Checks whether the two routes are the same, also extracts the route parameters
-	public function parseRoute (string $route): bool
+	public function getHttpParams (array $params = [])
 	{
-		$server_uri_array = explode('/', $route);
-		$req_uri_array = explode('/', $this->uri);
-
-		if(count($server_uri_array) !== count($req_uri_array))
-		{
-			return false;
-		}
-
-		$params = [];
-
-		foreach($server_uri_array as $i => $value)
-		{
-			if(str_starts_with($value, ':'))
-			{
-				$params[substr($value, 1)] = $req_uri_array[$i];
-			}
-			else if($value !== $req_uri_array[$i])
-			{
-				return false;
-			}
-		}
-
-		$this->params = (object) $params;
-
-		return true;
+		var_dump($params);
+		die();
 	}
 }
 

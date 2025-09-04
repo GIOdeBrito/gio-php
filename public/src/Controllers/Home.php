@@ -3,9 +3,15 @@
 require constant('ABSPATH').'/src/Models/Users.php';
 
 use GioPHP\MVC\Controller;
+use GioPHP\Routing\Route;
 
 class Home extends Controller
 {
+	#[Route(
+		method: 'GET',
+		path: '/public/',
+		description: 'Home page.'
+	)]
 	public function index ($req, $res): void
 	{
 		$viewData = [
@@ -16,12 +22,11 @@ class Home extends Controller
 		$res->render('Home', '_layout', $viewData);
 	}
 
-	public static function staticTeste ($req, $res): void
-	{
-		$res->setStatus(200);
-		$res->html('<h1>Teste Static</h1>');
-	}
-
+	#[Route(
+		method: 'GET',
+		path: '/public/database',
+		description: 'Database test page.'
+	)]
 	public function db ($req, $res): void
 	{
 		$viewData = [
@@ -40,6 +45,12 @@ class Home extends Controller
 		$res->render('Home', '_layout', $viewData);
 	}
 
+	#[Route(
+		method: 'GET',
+		path: '/public/error',
+		description: 'Default error page.',
+		isError: true
+	)]
 	public function notFound ($req, $res)
 	{
 		$res->setStatus(404);
