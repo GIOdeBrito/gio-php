@@ -3,10 +3,15 @@
 namespace GioPHP\Http;
 
 require __DIR__.'/../Helpers/Types.php';
+require __DIR__.'/../Helpers/RouteAttributes.php';
 
 use GioPHP\Services\Logger;
 use GioPHP\Http\FileData;
-use function GioPHP\Helpers\convertToType;
+use function GioPHP\Helpers\{
+	convertToType,
+	getSchemaMethod,
+	getSchemaTypes
+};
 
 class Request
 {
@@ -73,7 +78,7 @@ class Request
 		foreach($schema as $key => $value):
 
 			$name = $key;
-			$entry = mb_strtolower(explode(':', $value)[0], 'UTF-8');
+			$entry = getSchemaMethod($value);
 			$type = mb_strtolower(explode(':', $value)[1], 'UTF-8');
 
 			switch($entry)
@@ -156,19 +161,30 @@ class Request
 			return false;
 		}
 
+		// Checks if route expects multiple files
+		$isMultipleFileType = str_contains($type, '[]');
+
 		// Checks if multiple files are being sent at once
 		$isMultiForm = is_array($filedata['name']) ? true : false;
 
-		if(!$isMultiForm)
+		if($isMultipleFileType !== $isMultiForm)
 		{
-			$name = $filedata['name'];
-			$fullpath = $filedata['full_path'];
-			$type = $filedata['type'];
-			$tempname = $filedata['tmp_name'];
-			$error = $filedata['error'];
-			$size = $filedata['size'];
+			return false;
+		}
 
-			$this->files[$key] = new FileData(
+		// Get the file types that are allowed
+		$allowedTypes = getSchemaTypes($type);
+
+		if(!$isMultipleFileType)
+		{
+			$name = $filedata['name'][$i];
+			$fullpath = $filedata['full_path'][$i];
+			$type = $filedata['type'][$i];
+			$tempname = $filedata['tmp_name'][$i];
+			$error = $filedata['error'][$i];
+			$size = $filedata['size'][$i];
+
+			$fileItem = new FileData(
 				$name,
 				$fullpath,
 				$type,
@@ -176,6 +192,13 @@ class Request
 				$error,
 				$size
 			);
+
+			if(!in_array($fileItem->exntension(), $allowedTypes))
+			{
+				return false;
+			}
+
+			$this->files[$key] = $fileItem;
 
 			return true;
 		}
@@ -189,7 +212,7 @@ class Request
 			$error = $filedata['error'][$i];
 			$size = $filedata['size'][$i];
 
-			$this->files[$key][$i] = new FileData(
+			$fileItem = new FileData(
 				$name,
 				$fullpath,
 				$type,
@@ -198,7 +221,35 @@ class Request
 				$size
 			);
 
+			if(!in_array($fileItem->extension(), $allowedTypes))
+			{
+				continue;
+			}
+
+			$this->files[$key][$i] = $fileItem;
+
 		endfor;
+
+		return true;
+	}
+
+	private function getSingleFileParam (): ?FileData
+	{
+		$name = $filedata['name'];
+		$fullpath = $filedata['full_path'];
+		$type = $filedata['type'];
+		$tempname = $filedata['tmp_name'];
+		$error = $filedata['error'];
+		$size = $filedata['size'];
+
+		$this->files[$key] = new FileData(
+			$name,
+			$fullpath,
+			$type,
+			$tempname,
+			$error,
+			$size
+		);
 
 		return true;
 	}
