@@ -114,14 +114,14 @@ class Home extends Controller
 
 	#[Route(
 		method: 'GET',
-		path: '/public/error',
-		description: 'Default error page.',
-		isError: true
+		path: '/public/404',
+		description: 'Default not found page.',
+		isFallbackRoute: true
 	)]
 	public function notFound ($req, $res)
 	{
 		$res->setStatus(404);
-		$res->html("<h1>Not Found<h1>");
+		$res->html("<h1>Not Found</h1>");
 	}
 }
 

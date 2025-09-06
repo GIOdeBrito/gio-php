@@ -44,7 +44,7 @@ class Router
 
 			if(!$this->methodExists($schema->method))
 			{
-				continue;
+				throw new \Exception("Method: '{$schema->method}' is not valid.");
 			}
 
 			$controllerRoute = new ControllerRoute();
@@ -54,7 +54,7 @@ class Router
 			$controllerRoute->schema = $schema->schema;
 			$controllerRoute->controller = [$controller, $schema->functionName];
 
-			if($schema->isError)
+			if($schema->isFallbackRoute)
 			{
 				$this->notFoundPage = $controllerRoute->path;
 			}

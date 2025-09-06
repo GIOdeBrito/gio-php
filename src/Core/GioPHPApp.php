@@ -14,10 +14,10 @@ use GioPHP\Routing\Router;
 use GioPHP\Services\{Loader, Logger, ComponentRegistry};
 use GioPHP\Database\Db;
 
-use function GioPHP\Error\{ErrorHandler, PHPShutdownHandler};
+use function GioPHP\Error\{ErrorHandler, ShutdownHandler};
 
 ErrorHandler();
-PHPShutdownHandler();
+ShutdownHandler();
 
 define("GIOPHP_SRC_ROOT_PATH", __DIR__.'/..');
 

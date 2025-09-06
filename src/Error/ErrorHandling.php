@@ -19,7 +19,7 @@ function ErrorHandler ()
 	});
 }
 
-function PHPShutdownHandler ()
+function ShutdownHandler ()
 {
 	register_shutdown_function(function ()
 	{
@@ -38,7 +38,7 @@ function PHPShutdownHandler ()
 
 		error_log($output);
 
-		echo "Internal Server Error. Contact the webmaster.";
+		echo file_get_contents(__DIR__.'/../Template/_internalerror.php');
 		die();
 	});
 }
