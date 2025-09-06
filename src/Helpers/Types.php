@@ -2,8 +2,6 @@
 
 namespace GioPHP\Helpers;
 
-require __DIR__.'/DateTime.php';
-
 use function GioPHP\Helpers\toDateTime;
 
 function convertToType (mixed $value, string $type = 'any'): mixed

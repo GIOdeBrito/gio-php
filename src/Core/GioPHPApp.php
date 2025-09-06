@@ -2,9 +2,22 @@
 
 namespace GioPHP\Core;
 
+ini_set('display_errors', '0');
+error_reporting(E_ALL);
+
+require_once __DIR__.'/../Error/ErrorHandling.php';
+require_once __DIR__.'/../Helpers/DateTime.php';
+require_once __DIR__.'/../Helpers/RouteAttributes.php';
+require_once __DIR__.'/../Helpers/Types.php';
+
 use GioPHP\Routing\Router;
 use GioPHP\Services\{Loader, Logger, ComponentRegistry};
 use GioPHP\Database\Db;
+
+use function GioPHP\Error\{ErrorHandler, PHPShutdownHandler};
+
+ErrorHandler();
+PHPShutdownHandler();
 
 define("GIOPHP_SRC_ROOT_PATH", __DIR__.'/..');
 
@@ -53,7 +66,7 @@ class GioPHPApp
 			$response = $this->router->call();
 			die();
 		}
-		catch(\Exception $ex)
+		catch(\ErrorException $ex)
 		{
 			$this->logger->error($ex->getMessage());
 			die();

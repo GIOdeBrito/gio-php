@@ -13,7 +13,9 @@ class Route
         public array $schema = [],
 		public string $description = '',
 		public bool $isError = false,
-		public bool $isStatic = false
+		public bool $isStatic = false,
+
+		public string $functionName = '',
     ) {}
 }
 

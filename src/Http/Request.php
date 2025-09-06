@@ -2,9 +2,6 @@
 
 namespace GioPHP\Http;
 
-require __DIR__.'/../Helpers/Types.php';
-require __DIR__.'/../Helpers/RouteAttributes.php';
-
 use GioPHP\Services\Logger;
 use GioPHP\Http\FileData;
 use function GioPHP\Helpers\{

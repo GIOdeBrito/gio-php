@@ -7,6 +7,8 @@ use GioPHP\Services\{Loader, Logger, ComponentRegistry};
 use GioPHP\Database\Db;
 use GioPHP\Routing\ControllerRoute;
 
+use function GioPHP\Helpers\getControllerSchemas;
+
 class Router
 {
 	private array $routes = [];
@@ -36,42 +38,28 @@ class Router
 
 	public function addController (string $controller): void
 	{
-		$reflect = new \ReflectionClass($controller);
+		$schemas = getControllerSchemas($controller);
 
-		foreach($reflect->getMethods() as $method):
+		foreach($schemas as $schema):
 
-			$routeAttributes = $method->getAttributes();
-
-			// Skip iteration if no attribute was found
-			if(empty($routeAttributes))
+			if(!$this->methodExists($schema->method))
 			{
 				continue;
 			}
 
-			foreach($routeAttributes as $attribute):
+			$controllerRoute = new ControllerRoute();
+			$controllerRoute->method = $schema->method;
+			$controllerRoute->path = $schema->path;
+			$controllerRoute->description = $schema->description;
+			$controllerRoute->schema = $schema->schema;
+			$controllerRoute->controller = [$controller, $schema->functionName];
 
-				$route = $attribute->newInstance();
+			if($schema->isError)
+			{
+				$this->notFoundPage = $controllerRoute->path;
+			}
 
-				if(!$this->methodExists($route->method))
-				{
-					continue;
-				}
-
-				$controllerRoute = new ControllerRoute();
-				$controllerRoute->method = $route->method;
-				$controllerRoute->path = $route->path;
-				$controllerRoute->description = $route->description;
-				$controllerRoute->schema = $route->schema;
-				$controllerRoute->controller = [$controller, $method->getName()];
-
-				if($route->isError)
-				{
-					$this->notFoundPage = $controllerRoute->path;
-				}
-
-				$this->routes[$route->method][$route->path] = $controllerRoute;
-
-			endforeach;
+			$this->routes[$schema->method][$schema->path] = $controllerRoute;
 
 		endforeach;
 	}
